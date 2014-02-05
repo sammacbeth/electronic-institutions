@@ -13,6 +13,19 @@ import uk.ac.imperial.einst.Institution;
 import uk.ac.imperial.einst.Module;
 import uk.ac.imperial.einst.RuleResources;
 
+/**
+ * The Access Control module provides support for establishing {@link RoleOf}
+ * facts with fine-grain control over how these roles are assigned. Roles are
+ * assigned by an agent with the role of "gatekeeper". The following access
+ * control methods are available:
+ * <ul>
+ * <li>Discretionary - gatekeeper can decide whether to assign the role or not.</li>
+ * <li>None - gatekeeper must assign role to any applicant.</li>
+ * </ul>
+ * 
+ * @author Sam Macbeth
+ * 
+ */
 @RuleResources("einst/access.drl")
 public class AccessControl implements Module {
 
@@ -20,9 +33,9 @@ public class AccessControl implements Module {
 	 * Constants for special roles
 	 */
 	public final static String GATEKEEPER = "gatekeeper";
-	
+
 	StatefulKnowledgeSession session;
-	
+
 	public AccessControl() {
 		super();
 	}
@@ -32,7 +45,7 @@ public class AccessControl implements Module {
 			StatefulKnowledgeSession session) {
 		this.session = session;
 	}
-	
+
 	public Set<String> getRoles(final Actor a, final Institution i) {
 		final Set<String> roles = new HashSet<String>();
 		Collection<Object> res = session.getObjects(new ObjectFilter() {

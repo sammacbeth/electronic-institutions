@@ -12,6 +12,14 @@ import uk.ac.imperial.einst.EInstSession;
 import uk.ac.imperial.einst.Module;
 import uk.ac.imperial.einst.RuleResources;
 
+/**
+ * Implementation of Institutionalised Power. This module just deals with access
+ * to powers, permissions and obligations facts. It depends on other modules
+ * correctly utilising the {@link Pow} and {@link Obl} objects with drools.
+ * 
+ * @author Sam Macbeth
+ * 
+ */
 @RuleResources("einst/ipower.drl")
 public class IPower implements Module {
 

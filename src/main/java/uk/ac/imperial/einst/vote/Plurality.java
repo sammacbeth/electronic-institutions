@@ -5,12 +5,19 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Winner determination method where the most named candidate wins. Only works
+ * with single votes. Ties are not resolved, there is simply no winner.
+ * 
+ * @author Sam Macbeth
+ * 
+ */
 public class Plurality {
 
 	public static String NAME = "plurality";
 
 	public static VoteResult determineWinner(Ballot ballot, Set<Vote> votes) {
-		if (ballot.getIssue().getMethod() != VoteMethod.SINGLE_CANDIDATE) {
+		if (ballot.getIssue().getMethod() != VoteMethod.SINGLE) {
 			throw new RuntimeException("Cannot count "
 					+ ballot.getIssue().getMethod().name()
 					+ " votes with Plurality method.");

@@ -22,6 +22,14 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
 import org.drools.time.SessionPseudoClock;
 
+/**
+ * Builds and manages a Drools session governing interactions their consequences
+ * in an Electronic Institution. This is the entry points for agent interaction
+ * with the institution.
+ * 
+ * @author Sam Macbeth
+ * 
+ */
 public class EInstSession {
 
 	private final Logger logger = Logger.getLogger(EInstSession.class);
@@ -31,6 +39,21 @@ public class EInstSession {
 	int t = 0;
 	protected Set<Module> modules;
 
+	/**
+	 * Create an Electronic Institution session with the given modules. Module
+	 * classes are instantiated by the class and can be retrieved via
+	 * {@link #getModule(Class)}.
+	 * 
+	 * @param modules
+	 *            Set of module classes to use for rules and state access.
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @see Module
+	 */
 	public EInstSession(Iterable<Class<? extends Module>> modules)
 			throws NoSuchMethodException, SecurityException,
 			InstantiationException, IllegalAccessException,
@@ -57,6 +80,12 @@ public class EInstSession {
 
 	}
 
+	/**
+	 * Copy constructor. Allows generation of a new drools session without
+	 * having to rebuild the knowledge base.
+	 * 
+	 * @param session
+	 */
 	public EInstSession(EInstSession session) {
 		super();
 		this.kbase = session.kbase;
@@ -96,6 +125,9 @@ public class EInstSession {
 		session.setGlobal("logger", logger);
 	}
 
+	/**
+	 * Increments the session clock and triggers rules.
+	 */
 	public void incrementTime() {
 		clock.advanceTime(1, TimeUnit.SECONDS);
 		session.fireAllRules();
@@ -108,15 +140,32 @@ public class EInstSession {
 		logger.info("-----");
 	}
 
+	/**
+	 * Inserts a new fact into the session.
+	 * 
+	 * @param o
+	 */
 	public void insert(Object o) {
 		session.insert(o);
 	}
 
+	/**
+	 * Inserts an institutional action into the session.
+	 * 
+	 * @param a
+	 */
 	public void insert(Action a) {
 		a.setT(t);
 		session.insert(a);
 	}
 
+	/**
+	 * Get a module for access to internal session state.
+	 * 
+	 * @param moduleClass
+	 * @return
+	 * @throws UnavailableModuleException
+	 */
 	@SuppressWarnings("unchecked")
 	public <M extends Module> M getModule(Class<M> moduleClass)
 			throws UnavailableModuleException {
