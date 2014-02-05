@@ -106,8 +106,7 @@ end
 
 rule "Plurality Winner Determination"
 	when
-		CloseBallot($a : actor, $i : inst, $b : ballot, $t : t, valid == true)
-		Ballot(this == $b, status == Ballot.Status.CLOSED, wdm == Plurality.NAME)
+		$b : Ballot(status == Ballot.Status.CLOSED, wdm == Plurality.NAME)
 		not( VoteResult(ballot == $b) )
 		$votes : Set() from collect( Vote(ballot == $b, valid == true))
 	then
