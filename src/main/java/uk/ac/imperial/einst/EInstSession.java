@@ -24,7 +24,7 @@ import org.drools.time.SessionPseudoClock;
 
 public class EInstSession {
 
-	private final Logger logger = Logger.getLogger(SpecificationTest.class);
+	private final Logger logger = Logger.getLogger(EInstSession.class);
 	protected StatefulKnowledgeSession session;
 	protected KnowledgeBase kbase;
 	private SessionPseudoClock clock;
