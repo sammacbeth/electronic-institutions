@@ -1,0 +1,25 @@
+import uk.ac.imperial.einst.Actor
+import uk.ac.imperial.einst.Action
+
+import uk.ac.imperial.einst.ipower.Obl
+import uk.ac.imperial.einst.ipower.Pow
+
+global org.apache.log4j.Logger logger
+
+query pow(Actor a)
+	pow : Pow(actor == a)
+end
+
+query obl(Actor a)
+	obl : Obl(actor == a)
+end
+
+rule "Mark satisfied Obligations"
+	when
+		$act : Action($a : actor)
+		$obl : Obl(this.matches($act), actor == $a, done == false)
+	then
+		modify($obl) {
+			setDone(true);
+		}
+end

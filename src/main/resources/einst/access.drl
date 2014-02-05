@@ -1,0 +1,58 @@
+import uk.ac.imperial.einst.access.Apply
+import uk.ac.imperial.einst.access.Assign
+
+import uk.ac.imperial.einst.access.AccessControl
+import uk.ac.imperial.einst.access.ACMethod
+import uk.ac.imperial.einst.access.RoleOf
+
+import uk.ac.imperial.einst.ipower.Obl
+import uk.ac.imperial.einst.ipower.Pow
+
+global org.apache.log4j.Logger logger
+
+declare Apply
+	@role( event )
+end
+declare Assign
+	@role( event )
+end
+
+rule "Validate application"
+	when
+		$app : Apply($a : actor, $i : inst, $r : role, valid == false)
+		not( RoleOf(actor == $a, inst == $i, role == $r) )
+	then
+		modify($app) {
+			setValid(true);
+		}
+end
+
+rule "Assign Role"
+	when
+		$assign : Assign($g : actor, $a : target, $i : inst, $r : role, $t : t)
+		Apply(actor == $a, inst == $i, role == $r, t < $t)
+		Pow( actor == $g, this.matches($assign))
+	then
+		insert( new RoleOf( $a, $i, $r ));
+end
+
+rule "Pow assign discretionary"
+	when
+		$app : Apply($a : actor, $i : inst, $r : role, valid == true)
+		ACMethod( inst == $i, role == $r, method == ACMethod.DISCRETIONARY)
+		RoleOf($g : actor, inst == $i, role == AccessControl.GATEKEEPER)
+	then
+		Pow p = new Pow($g, new Assign($g, $a, $i, $r) );
+		insertLogical( p );
+end
+
+rule "Pow + Obl assign none"
+	when
+		$app : Apply($a : actor, $i : inst, $r : role, valid == true)
+		ACMethod( inst == $i, role == $r, method == ACMethod.NONE)
+		RoleOf($g : actor, inst == $i, role == AccessControl.GATEKEEPER)
+	then
+		Assign act = new Assign($g, $a, $i, $r);
+		insertLogical( new Pow($g, act ) );
+		insert( new Obl($g, act ) );
+end

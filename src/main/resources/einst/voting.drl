@@ -1,0 +1,115 @@
+import uk.ac.imperial.einst.Institution
+
+import uk.ac.imperial.einst.access.RoleOf
+
+import uk.ac.imperial.einst.ipower.Obl
+import uk.ac.imperial.einst.ipower.Pow
+
+import uk.ac.imperial.einst.vote.Ballot
+import uk.ac.imperial.einst.vote.Issue
+import uk.ac.imperial.einst.vote.OpenBallot
+import uk.ac.imperial.einst.vote.CloseBallot
+import uk.ac.imperial.einst.vote.Declare
+import uk.ac.imperial.einst.vote.Plurality
+import uk.ac.imperial.einst.vote.Vote
+import uk.ac.imperial.einst.vote.VoteResult
+
+import java.util.Set
+
+global org.apache.log4j.Logger logger
+
+query getOpenBallot(Institution inst, Issue issue)
+	Issue(issue := this, inst := inst)
+	ballot : Ballot(getIssue() == issue, status == Ballot.Status.OPEN)
+end
+
+query getIssues(Institution inst)
+	issue : Issue(inst := inst)
+end
+
+rule "Open Ballot"
+	when
+		$open : OpenBallot($a : actor, $i : inst, $is : issue, $t: t, valid == false)
+		Issue(this == $is)
+		Pow(actor == $a, this.matches($open))
+	then
+		insert( new Ballot($is, $t) );
+		modify($open) {
+			setValid(true);
+		}
+end
+
+rule "Pow open ballot"
+	when
+		$is : Issue($i : inst, $r : cfvRoles)
+		RoleOf($h : actor, inst == $i, $r contains role)
+		not( Ballot(issue == $is, status == Ballot.Status.OPEN) )
+	then
+		Pow p = new Pow($h, new OpenBallot($h, $i, $is) );
+		insertLogical( p );
+end
+
+rule "Vote"
+	when
+		$v : Vote($a : actor, $i : inst, $b : ballot, $x : vote, $t : t, valid == false)
+		Ballot(this == $b, started < $t)
+		Pow(actor == $a, this.matches($v))
+	then
+		modify($v) {
+			setValid(true);
+		}
+end
+
+rule "Pow Vote"
+	when
+		$b : Ballot(status == Ballot.Status.OPEN, $r : voteRoles, $t : started)
+		RoleOf($a : actor, inst == $b.issue.inst, $r contains role)
+		not( Vote(actor == $a, inst == $b.issue.inst, ballot == $b, t > $t, valid == true) )
+	then
+		Pow p = new Pow($a, new Vote($a, $b.getIssue().getInst(), $b, null) );
+		insertLogical( p );
+end
+
+rule "Close Ballot"
+	when
+		$close : CloseBallot($a : actor, $i : inst, $b : ballot, $t : t, valid == false)
+		Pow(actor == $a, this.matches($close))
+	then
+		//insert( new Obl($a, new Declare($a, $i, $b, $b.determineWinner())));
+		modify($b) {
+			setStatus(Ballot.Status.CLOSED),
+			setClosedBy($a);
+		}
+		modify($close) {
+			setValid(true);
+		}
+end
+
+rule "Pow Close Ballot"
+	when
+		$is : Issue($i : inst, $r : cfvRoles)
+		RoleOf($h : actor, inst == $i, $r contains role)
+		$b : Ballot(issue == $is, status == Ballot.Status.OPEN)
+	then
+		Pow p = new Pow($h, new CloseBallot($h, $i, $b) );
+		insertLogical( p );
+end
+
+rule "Obl Declare Winner"
+	when
+		VoteResult($b : ballot, $w : winner)
+		Ballot(this == $b, $a : closedBy)
+	then
+		Declare d = new Declare($a, $b.getIssue().getInst(), $b, $w);
+		insert( new Obl($a, d));
+end
+
+rule "Plurality Winner Determination"
+	when
+		CloseBallot($a : actor, $i : inst, $b : ballot, $t : t, valid == true)
+		Ballot(this == $b, status == Ballot.Status.CLOSED, wdm == "plurality")
+		not( VoteResult(ballot == $b) )
+		$votes : Set() from collect( Vote(ballot == $b, valid == true))
+	then
+		insert(Plurality.determineWinner($b, $votes));
+end
