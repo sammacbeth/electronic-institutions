@@ -255,7 +255,7 @@ public class VoteTest extends SpecificationTest {
 		session.insert(new Vote(voters[0], i, bBorda, new Preferences("a", "b", "c", "e")));
 		session.insert(new Vote(voters[1], i, bBorda, new Preferences("a", "d", "b", "e")));
 		session.insert(new Vote(voters[2], i, bBorda, new Preferences("a", "c", "d", "e")));
-		session.insert(new Vote(voters[3], i, bBorda, new Preferences("b", "c", "d", "e")));
+		session.insert(new Vote(voters[3], i, bBorda, new Preferences("b", "c", "f", "e")));
 		session.insert(new Vote(voters[4], i, bBorda, new Preferences("b", "d", "c", "e")));
 		session.insert(new Vote(voters[5], i, bBorda, new Preferences("c", "d", "e", "b")));
 		session.insert(new Vote(voters[6], i, bBorda, new Preferences("d", "c", "e", "b")));

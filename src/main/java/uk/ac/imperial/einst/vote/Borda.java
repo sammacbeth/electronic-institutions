@@ -30,15 +30,15 @@ public class Borda {
 				continue;
 			}
 			List<Object> prefs = ((Preferences) v.getVote()).getList();
-			// not enough prefs or duplicates
-			if (new HashSet<Object>(prefs).size() != n) {
+			// check for duplicate preferences
+			if (new HashSet<Object>(prefs).size() != prefs.size()) {
 				invalidVotes++;
 				continue;
 			}
 			for (int k = 0; k < prefs.size(); k++) {
 				Object opt = prefs.get(k);
 				if (optionIdx.containsKey(opt)) {
-					bordaRank[optionIdx.get(opt)] += n - k + 1;
+					bordaRank[optionIdx.get(opt)] += n - k;
 				}
 			}
 		}
