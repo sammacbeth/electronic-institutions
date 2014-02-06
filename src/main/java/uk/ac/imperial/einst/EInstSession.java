@@ -3,8 +3,11 @@ package uk.ac.imperial.einst;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -31,6 +34,8 @@ import org.drools.time.SessionPseudoClock;
  * 
  */
 public class EInstSession {
+
+	private final boolean LOG_WM = true;
 
 	private final Logger logger = Logger.getLogger(EInstSession.class);
 	protected StatefulKnowledgeSession session;
@@ -133,11 +138,21 @@ public class EInstSession {
 		session.fireAllRules();
 		t++;
 
-		logger.info("Session:");
-		for (Object o : session.getObjects()) {
-			logger.info(o.toString());
+		if (LOG_WM) {
+			logger.info("Session:");
+			SortedSet<Object> wm = new TreeSet<Object>(
+					new Comparator<Object>() {
+						@Override
+						public int compare(Object o1, Object o2) {
+							return o1.toString().compareTo(o2.toString());
+						}
+					});
+			wm.addAll(session.getObjects());
+			for (Object o : wm) {
+				logger.info(o.toString());
+			}
+			logger.info("-----");
 		}
-		logger.info("-----");
 	}
 
 	/**

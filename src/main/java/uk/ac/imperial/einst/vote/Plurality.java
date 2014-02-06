@@ -1,13 +1,15 @@
 package uk.ac.imperial.einst.vote;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Winner determination method where the most named candidate wins. Only works
- * with single votes. Ties are not resolved, there is simply no winner.
+ * with single and preference votes. Ties are not resolved, there is simply no
+ * winner.
  * 
  * @author Sam Macbeth
  * 
@@ -17,7 +19,8 @@ public class Plurality {
 	public static String NAME = "plurality";
 
 	public static VoteResult determineWinner(Ballot ballot, Set<Vote> votes) {
-		if (ballot.getIssue().getMethod() != VoteMethod.SINGLE) {
+		VoteMethod method = ballot.getIssue().getMethod();
+		if (method != VoteMethod.SINGLE && method != VoteMethod.PREFERENCE) {
 			throw new RuntimeException("Cannot count "
 					+ ballot.getIssue().getMethod().name()
 					+ " votes with Plurality method.");
@@ -29,43 +32,39 @@ public class Plurality {
 		for (int i = 0; i < validOptions.length; i++) {
 			optionIdx.put(validOptions[i], i);
 		}
-		// tally votes
+
 		int invalidVotes = 0;
-		for (Vote v : votes) {
-			final Object val = v.getVote();
+		List<Object> voteValues = new LinkedList<Object>();
+		// expand preference votes
+		if (method == VoteMethod.PREFERENCE) {
+			for (Vote v : votes) {
+				if (v.getVote() instanceof Preferences) {
+					voteValues.addAll(((Preferences) v.getVote()).getList());
+				}
+				invalidVotes++;
+			}
+		} else {
+			for (Vote v : votes) {
+				voteValues.add(v.getVote());
+			}
+		}
+		// tally votes
+		for (Object val : voteValues) {
 			if (optionIdx.containsKey(val)) {
 				voteCount[optionIdx.get(val)]++;
 			} else {
 				invalidVotes++;
 			}
 		}
-		// create results
-		int best = 0;
-		Set<Object> leaders = new HashSet<Object>();
 
+		// create results
 		VoteResult res = new VoteResult(ballot);
 		res.setInvalidCount(invalidVotes);
 		for (int i = 0; i < voteCount.length; i++) {
 			Object opt = validOptions[i];
 			int count = voteCount[i];
 			res.setScore(opt, count);
-			if (count > best) {
-				best = count;
-				leaders.clear();
-				leaders.add(opt);
-			} else if (count == best) {
-				leaders.add(opt);
-			}
 		}
-
-		if (leaders.size() == 1)
-			// outright winner
-			res.setWinner(leaders.iterator().next());
-		else
-			// tie - no winner
-			res.setWinner(null);
-
 		return res;
 	}
-
 }
