@@ -19,7 +19,7 @@ public class Apply extends Action {
 
 	@Override
 	public String toString() {
-		return "apply("+ getActor() +", "+ getInst() +", "+ role +")";
+		return "apply(" + getActor() + ", " + getInst() + ", " + role + ")";
 	}
 
 }

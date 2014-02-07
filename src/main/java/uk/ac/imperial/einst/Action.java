@@ -104,5 +104,4 @@ public abstract class Action {
 		else
 			return o1.equals(o2);
 	}
-
 }

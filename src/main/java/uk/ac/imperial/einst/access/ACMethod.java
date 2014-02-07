@@ -3,10 +3,10 @@ package uk.ac.imperial.einst.access;
 import uk.ac.imperial.einst.Institution;
 
 public class ACMethod {
-	
+
 	public final static String DISCRETIONARY = "discretionary";
 	public final static String NONE = "none";
-	
+
 	final Institution inst;
 	final String role;
 	final String method;
