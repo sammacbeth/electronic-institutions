@@ -12,6 +12,7 @@ import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.EInstSession;
 import uk.ac.imperial.einst.Module;
 import uk.ac.imperial.einst.RuleResources;
+import uk.ac.imperial.einst.ipower.Pow;
 
 @RuleResources("einst/provapp.drl")
 public class ProvisionAppropriationSystem implements Module {
@@ -44,6 +45,15 @@ public class ProvisionAppropriationSystem implements Module {
 		einst.getQueries().add(
 				session.openLiveQuery("getAppropriations", new Object[] { a },
 						null));
+	}
+
+	public List<Pow> getPowProvision(Actor a) {
+		List<Pow> pows = new LinkedList<Pow>();
+		for (QueryResultsRow row : session
+				.getQueryResults("getPowProvision", a)) {
+			pows.add((Pow) row.get("act"));
+		}
+		return pows;
 	}
 
 	class AppListener implements ViewChangedEventListener {

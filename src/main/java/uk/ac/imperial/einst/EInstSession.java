@@ -37,7 +37,7 @@ import org.drools.time.SessionPseudoClock;
  */
 public class EInstSession {
 
-	private final boolean LOG_WM = true;
+	private boolean LOG_WM = false;
 
 	private final Logger logger = Logger.getLogger(EInstSession.class);
 	protected StatefulKnowledgeSession session;

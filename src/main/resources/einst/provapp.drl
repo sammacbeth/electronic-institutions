@@ -22,6 +22,10 @@ query getAppropriations(Actor a)
 	app : Appropriate(actor == a, valid == true, item : artifact)
 end
 
+query getPowProvision(Actor a)
+	Pow(actor == a, act : action, this.matches(new Provision(a, null, null)))
+end
+
 rule "Provision"
 	when
 		$prov : Provision($a : actor, $i : inst, $item : artifact, valid == false)

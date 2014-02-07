@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import uk.ac.imperial.einst.Action;
 import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.Institution;
 import uk.ac.imperial.einst.Module;
@@ -74,7 +75,9 @@ public class ProvAppTest extends SpecificationTest {
 	}
 
 	@Test
-	public void testProvisionMultiPool() {
+	public void testProvisionMultiPool() throws UnavailableModuleException {
+		IPower ipow = session.getModule(IPower.class);
+
 		Institution i = new StubInstitution("i1");
 		Actor a = new StubActor("a1");
 		RoleOf r = new RoleOf(a, i, "test");
@@ -99,6 +102,9 @@ public class ProvAppTest extends SpecificationTest {
 		session.insert(pr3);
 
 		session.incrementTime();
+
+		List<Action> pows = ipow.powList(a, new Provision(a, null, null));
+		assertTrue(pows.size() == 2);
 
 		assertFalse(pr1.isValid());
 		assertTrue(pr2.isValid());
