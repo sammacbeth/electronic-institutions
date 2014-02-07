@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -22,6 +24,7 @@ import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.conf.ClockTypeOption;
+import org.drools.runtime.rule.LiveQuery;
 import org.drools.time.SessionPseudoClock;
 
 /**
@@ -42,6 +45,7 @@ public class EInstSession {
 	private SessionPseudoClock clock;
 	int t = 0;
 	protected Set<Module> modules;
+	List<LiveQuery> queries = new LinkedList<LiveQuery>();
 
 	/**
 	 * Create an Electronic Institution session with the given modules. Module
@@ -194,6 +198,19 @@ public class EInstSession {
 
 	public void retract(Object o) {
 		this.session.retract(this.session.getFactHandle(o));
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		for (LiveQuery q : queries) {
+			q.close();
+		}
+		this.session.dispose();
+		super.finalize();
+	}
+
+	public List<LiveQuery> getQueries() {
+		return queries;
 	}
 
 }

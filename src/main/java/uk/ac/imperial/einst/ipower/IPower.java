@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.LiveQuery;
 import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.QueryResultsRow;
 
@@ -25,8 +24,8 @@ import uk.ac.imperial.einst.RuleResources;
 @RuleResources("einst/ipower.drl")
 public class IPower implements Module {
 
+	EInstSession einst;
 	StatefulKnowledgeSession session;
-	List<LiveQuery> queries = new LinkedList<LiveQuery>();
 
 	public IPower() {
 		super();
@@ -35,6 +34,7 @@ public class IPower implements Module {
 	@Override
 	public void initialise(EInstSession eInstSession,
 			StatefulKnowledgeSession session) {
+		this.einst = eInstSession;
 		this.session = session;
 	}
 
@@ -57,8 +57,9 @@ public class IPower implements Module {
 	}
 
 	public void registerObligationReactive(ObligationReactive r, Actor a) {
-		queries.add(session.openLiveQuery("obl", new Object[] { a },
-				new ObligationListener(r)));
+		this.einst.getQueries().add(
+				session.openLiveQuery("obl", new Object[] { a },
+						new ObligationListener(r)));
 	}
 
 	public boolean pow(Actor a, Action act) {

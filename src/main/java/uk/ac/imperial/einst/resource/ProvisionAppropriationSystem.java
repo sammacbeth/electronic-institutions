@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.QueryResultsRow;
+import org.drools.runtime.rule.Row;
+import org.drools.runtime.rule.ViewChangedEventListener;
 
 import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.EInstSession;
@@ -35,6 +37,35 @@ public class ProvisionAppropriationSystem implements Module {
 			apps.add(row.get("item"));
 		}
 		return apps;
+	}
+
+	public void registerForAppropriations(Actor a,
+			AppropriationsListener listener) {
+		einst.getQueries().add(
+				session.openLiveQuery("getAppropriations", new Object[] { a },
+						null));
+	}
+
+	class AppListener implements ViewChangedEventListener {
+		final AppropriationsListener client;
+
+		public AppListener(AppropriationsListener client) {
+			super();
+			this.client = client;
+		}
+
+		@Override
+		public void rowAdded(Row row) {
+			client.onAppropriation(row.get("item"));
+		}
+
+		@Override
+		public void rowRemoved(Row row) {
+		}
+
+		@Override
+		public void rowUpdated(Row row) {
+		}
 	}
 
 }
