@@ -1,0 +1,39 @@
+import uk.ac.imperial.einst.access.RoleOf
+import uk.ac.imperial.einst.ipower.Obl
+import uk.ac.imperial.einst.ipower.Pow
+import uk.ac.imperial.einst.resource.Pool
+import uk.ac.imperial.einst.resource.Provision
+
+global org.apache.log4j.Logger logger
+
+declare Provision
+	@role( event )
+end
+
+rule "Provision"
+	when
+		$prov : Provision($a : actor, $i : inst, $item : artifact, valid == false)
+		Pow(actor == $a, this.matches($prov), this before[-1s] $prov )
+	then
+		modify($prov) {
+			setValid(true);
+		}
+end
+
+rule "Pow Provision"
+	when
+		RoleOf($a : actor, $r : role, $i : inst)
+		Pool(inst == $i, contribRoles contains $r, $type : artifactMatcher)
+	then
+		insertLogical( new Pow($a, new Provision($a, $i, $type)));
+end
+
+rule "Add provisions to pool"
+	when
+		$prov : Provision($i : inst, $item : artifact, valid == true)
+		$p : Pool(inst == $i, artifactMatcher.matches($item))
+		not( Pool.Added(pool == $p, prov == $prov ) )
+	then
+		$p.getArtifacts().add($item);
+		insert($p.new Added($prov));
+end

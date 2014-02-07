@@ -6,6 +6,10 @@ import uk.ac.imperial.einst.ipower.Pow
 
 global org.apache.log4j.Logger logger
 
+declare Pow
+	@role( event )
+end
+
 query pow(Actor a)
 	pow : Pow(actor == a)
 end

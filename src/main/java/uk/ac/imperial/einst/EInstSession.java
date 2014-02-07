@@ -192,4 +192,8 @@ public class EInstSession {
 		throw new UnavailableModuleException(moduleClass);
 	}
 
+	public void retract(Object o) {
+		this.session.retract(this.session.getFactHandle(o));
+	}
+
 }
