@@ -18,7 +18,6 @@ import org.drools.builder.CompositeKnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
-import org.drools.conf.EventProcessingOption;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -111,10 +110,11 @@ public class EInstSession {
 			System.err.println(kbuilder.getErrors().toString());
 			throw new RuntimeException("Drools compile errors");
 		}
-		// drools fusion config
+		// drools fusion config - disabled because of aggressive event
+		// retraction
 		KnowledgeBaseConfiguration baseConf = KnowledgeBaseFactory
 				.newKnowledgeBaseConfiguration();
-		baseConf.setOption(EventProcessingOption.STREAM);
+		// baseConf.setOption(EventProcessingOption.STREAM);
 
 		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(baseConf);
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());

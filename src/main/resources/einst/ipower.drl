@@ -10,7 +10,11 @@ declare Pow
 	@role( event )
 end
 
-query pow(Actor a)
+query pow(Actor a, Action act)
+	pow : Pow(actor == a, this.matches(act))
+end
+
+query allPows(Actor a)
 	pow : Pow(actor == a)
 end
 

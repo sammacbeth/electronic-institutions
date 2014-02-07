@@ -1,13 +1,25 @@
 import uk.ac.imperial.einst.access.RoleOf
 import uk.ac.imperial.einst.ipower.Obl
 import uk.ac.imperial.einst.ipower.Pow
+import uk.ac.imperial.einst.resource.Appropriate
 import uk.ac.imperial.einst.resource.Pool
 import uk.ac.imperial.einst.resource.Provision
+import uk.ac.imperial.einst.resource.Request
+
+import java.util.ArrayList
 
 global org.apache.log4j.Logger logger
 
 declare Provision
 	@role( event )
+end
+
+declare Appropriate
+	@role( event )
+end
+
+query getAppropriations(Actor a)
+	app : Appropriate(actor == a, valid == true, item : artifact)
 end
 
 rule "Provision"
@@ -34,6 +46,45 @@ rule "Add provisions to pool"
 		$p : Pool(inst == $i, artifactMatcher.matches($item))
 		not( Pool.Added(pool == $p, prov == $prov ) )
 	then
-		$p.getArtifacts().add($item);
+		modify($p) {
+			getArtifacts().add($item);
+		}
 		insert($p.new Added($prov));
+end
+
+rule "Appropriate request"
+	when
+		$req : Request($a : actor, $i : inst, $query : query, $lim : limit, valid == false)
+		$matched : ArrayList() from collect( Provision(valid == true, inst == $i, $query.matches(artifact)))
+	then
+		modify($req) {
+			setValid(true);
+		}
+		// limit appropriation count
+		int count = $matched.size();
+		if($lim > 0 && count > $lim)
+			count = $lim;
+		// appropriate matched
+		for(int i=0; i< count; i++) {
+			insert(new Appropriate($a, $i, ((Provision)$matched.get(i)).getArtifact()));
+		}
+end
+
+rule "Appropriate"
+	when
+		$app : Appropriate($a : actor, $i : inst, $item : artifact, valid == false)
+		Provision(inst == $i, artifact == $item, valid == true, this before $app)
+		Pow(actor == $a, this.matches($app), this before[-1s] $app )
+	then
+		modify($app) {
+			setValid(true);
+		}
+end
+
+rule "Pow Appropriate"
+	when
+		RoleOf($a : actor, $r : role, $i : inst)
+		Pool(inst == $i, extractRoles contains $r, $type : artifactMatcher)
+	then
+		insertLogical( new Pow($a, new Appropriate($a, $i, $type)));
 end

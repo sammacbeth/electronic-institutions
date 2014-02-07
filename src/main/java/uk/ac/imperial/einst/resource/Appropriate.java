@@ -4,11 +4,11 @@ import uk.ac.imperial.einst.Action;
 import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.Institution;
 
-public class Provision extends Action {
+public class Appropriate extends Action {
 
 	final Object artifact;
 
-	public Provision(Actor actor, Institution inst, Object artifact) {
+	public Appropriate(Actor actor, Institution inst, Object artifact) {
 		super(actor, inst);
 		this.artifact = artifact;
 	}
@@ -19,7 +19,7 @@ public class Provision extends Action {
 
 	@Override
 	public String toString() {
-		return "provision(" + getActor() + ", " + getInst() + ", " + artifact
+		return "appropriate(" + getActor() + ", " + getInst() + ", " + artifact
 				+ ")";
 	}
 

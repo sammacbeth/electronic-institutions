@@ -8,6 +8,7 @@ import org.drools.runtime.rule.LiveQuery;
 import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.QueryResultsRow;
 
+import uk.ac.imperial.einst.Action;
 import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.EInstSession;
 import uk.ac.imperial.einst.Module;
@@ -39,7 +40,7 @@ public class IPower implements Module {
 
 	public List<Pow> getPowers(Actor a) {
 		List<Pow> pows = new LinkedList<Pow>();
-		QueryResults res = session.getQueryResults("pow", a);
+		QueryResults res = session.getQueryResults("allPows", a);
 		for (QueryResultsRow row : res) {
 			pows.add((Pow) row.get("pow"));
 		}
@@ -58,6 +59,10 @@ public class IPower implements Module {
 	public void registerObligationReactive(ObligationReactive r, Actor a) {
 		queries.add(session.openLiveQuery("obl", new Object[] { a },
 				new ObligationListener(r)));
+	}
+
+	public boolean pow(Actor a, Action act) {
+		return session.getQueryResults("pow", a, act).size() > 0;
 	}
 
 }
