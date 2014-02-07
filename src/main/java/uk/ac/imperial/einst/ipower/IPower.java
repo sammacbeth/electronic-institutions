@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.LiveQuery;
 import org.drools.runtime.rule.QueryResults;
 import org.drools.runtime.rule.QueryResultsRow;
 
@@ -24,6 +25,7 @@ import uk.ac.imperial.einst.RuleResources;
 public class IPower implements Module {
 
 	StatefulKnowledgeSession session;
+	List<LiveQuery> queries = new LinkedList<LiveQuery>();
 
 	public IPower() {
 		super();
@@ -51,6 +53,11 @@ public class IPower implements Module {
 			obls.add((Obl) row.get("obl"));
 		}
 		return obls;
+	}
+
+	public void registerObligationReactive(ObligationReactive r, Actor a) {
+		queries.add(session.openLiveQuery("obl", new Object[] { a },
+				new ObligationListener(r)));
 	}
 
 }
