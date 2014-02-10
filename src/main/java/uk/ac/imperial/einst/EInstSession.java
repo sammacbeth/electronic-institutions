@@ -144,15 +144,7 @@ public class EInstSession {
 
 		if (LOG_WM) {
 			logger.info("Session:");
-			SortedSet<Object> wm = new TreeSet<Object>(
-					new Comparator<Object>() {
-						@Override
-						public int compare(Object o1, Object o2) {
-							return o1.toString().compareTo(o2.toString());
-						}
-					});
-			wm.addAll(session.getObjects());
-			for (Object o : wm) {
+			for (Object o : getObjects()) {
 				logger.info(o.toString());
 			}
 			logger.info("-----");
@@ -211,6 +203,17 @@ public class EInstSession {
 
 	public List<LiveQuery> getQueries() {
 		return queries;
+	}
+
+	public SortedSet<Object> getObjects() {
+		SortedSet<Object> wm = new TreeSet<Object>(new Comparator<Object>() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		wm.addAll(session.getObjects());
+		return wm;
 	}
 
 }
