@@ -57,9 +57,10 @@ rule "Add provisions to pool"
 end
 
 rule "Appropriate request"
+	salience -1
 	when
 		$req : Request($a : actor, $i : inst, $query : query, $lim : limit, valid == false)
-		$matched : ArrayList() from collect( Provision(valid == true, inst == $i, $query.matches(artifact)))
+		$matched : ArrayList() from collect( Provision(actor != $a, valid == true, inst == $i, $query.matches(artifact)))
 	then
 		modify($req) {
 			setValid(true);
@@ -70,7 +71,9 @@ rule "Appropriate request"
 			count = $lim;
 		// appropriate matched
 		for(int i=0; i< count; i++) {
-			insert(new Appropriate($a, $i, ((Provision)$matched.get(i)).getArtifact()));
+			Appropriate app = new Appropriate($a, $i, ((Provision)$matched.get(i)).getArtifact());
+			app.setT($req.getT());
+			insert(app);
 		}
 end
 

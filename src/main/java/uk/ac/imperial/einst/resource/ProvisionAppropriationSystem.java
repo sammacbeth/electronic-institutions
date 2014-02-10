@@ -44,7 +44,7 @@ public class ProvisionAppropriationSystem implements Module {
 			AppropriationsListener listener) {
 		einst.getQueries().add(
 				session.openLiveQuery("getAppropriations", new Object[] { a },
-						null));
+						new AppListener(listener)));
 	}
 
 	public List<Pow> getPowProvision(Actor a) {

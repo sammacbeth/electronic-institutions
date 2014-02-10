@@ -13,7 +13,7 @@ public abstract class Action {
 	final Actor actor;
 	final Institution inst;
 	boolean valid = false;
-	int t = 0;
+	int t = -1;
 
 	protected Action(Actor actor, Institution inst) {
 		super();
@@ -103,5 +103,12 @@ public abstract class Action {
 			return true;
 		else
 			return o1.equals(o2);
+	}
+
+	protected String toStringSuffix() {
+		if (t >= 0)
+			return " at " + t;
+		else
+			return "";
 	}
 }

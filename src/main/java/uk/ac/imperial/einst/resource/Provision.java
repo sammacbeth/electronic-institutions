@@ -20,7 +20,7 @@ public class Provision extends Action {
 	@Override
 	public String toString() {
 		return "provision(" + getActor() + ", " + getInst() + ", " + artifact
-				+ ")";
+				+ ")" + toStringSuffix();
 	}
 
 }

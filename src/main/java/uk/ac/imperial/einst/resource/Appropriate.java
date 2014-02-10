@@ -20,7 +20,7 @@ public class Appropriate extends Action {
 	@Override
 	public String toString() {
 		return "appropriate(" + getActor() + ", " + getInst() + ", " + artifact
-				+ ")";
+				+ ")" + toStringSuffix();
 	}
 
 }

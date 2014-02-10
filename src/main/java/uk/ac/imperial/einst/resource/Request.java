@@ -27,7 +27,7 @@ public class Request extends Action {
 	@Override
 	public String toString() {
 		return "request(" + getActor() + ", " + getInst() + ", " + query + ", "
-				+ limit + ")";
+				+ limit + ")" + toStringSuffix();
 	}
 
 }
