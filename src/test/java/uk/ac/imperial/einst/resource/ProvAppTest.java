@@ -123,33 +123,36 @@ public class ProvAppTest extends SpecificationTest {
 		IPower ipow = session.getModule(IPower.class);
 
 		Institution i = new StubInstitution("i1");
-		Actor a = new StubActor("a1");
-		RoleOf r = new RoleOf(a, i, "test");
+		Actor a1 = new StubActor("a1");
+		RoleOf r1 = new RoleOf(a1, i, "test");
+		Actor a2 = new StubActor("a2");
+		RoleOf r2 = new RoleOf(a2, i, "test");
 		Set<String> contribRoles = new HashSet<String>();
 		contribRoles.add("test");
 		Pool p1 = new Pool(i, contribRoles, contribRoles,
 				new ArtifactTypeMatcher(Institution.class));
 
-		session.insert(r);
+		session.insert(r1);
+		session.insert(r2);
 		session.insert(p1);
-		session.insert(new Provision(a, i, i));
+		session.insert(new Provision(a2, i, i));
 		session.incrementTime();
 
 		// test appropriation powers
-		assertTrue(ipow.pow(a, new Appropriate(a, i, null)));
-		assertFalse(ipow.pow(a, new Appropriate(a, i, new Object())));
-		assertTrue(ipow
-				.pow(a, new Appropriate(a, i, new StubInstitution(null))));
-		assertFalse(ipow.pow(a, new Appropriate(a, i, a)));
-		assertTrue(ipow.pow(a, new Appropriate(a, i, i)));
+		assertTrue(ipow.pow(a1, new Appropriate(a1, i, null)));
+		assertFalse(ipow.pow(a1, new Appropriate(a1, i, new Object())));
+		assertTrue(ipow.pow(a1, new Appropriate(a1, i,
+				new StubInstitution(null))));
+		assertFalse(ipow.pow(a1, new Appropriate(a1, i, a1)));
+		assertTrue(ipow.pow(a1, new Appropriate(a1, i, i)));
 
-		Request req = new Request(a, i, new ArtifactTypeMatcher(
+		Request req = new Request(a1, i, new ArtifactTypeMatcher(
 				Institution.class), 5);
 		session.insert(req);
 		session.incrementTime();
 
 		assertTrue(req.isValid());
-		List<Object> apps = pas.getAppropriations(a);
+		List<Object> apps = pas.getAppropriations(a1);
 		assertTrue(apps.size() == 1);
 		assertEquals(i, apps.get(0));
 	}
