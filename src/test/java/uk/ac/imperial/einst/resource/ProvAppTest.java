@@ -118,6 +118,7 @@ public class ProvAppTest extends SpecificationTest {
 
 	@Test
 	public void testAppropriateRequest() throws UnavailableModuleException {
+		session.LOG_WM = true;
 		ProvisionAppropriationSystem pas = session
 				.getModule(ProvisionAppropriationSystem.class);
 		IPower ipow = session.getModule(IPower.class);
@@ -155,5 +156,23 @@ public class ProvAppTest extends SpecificationTest {
 		List<Object> apps = pas.getAppropriations(a1);
 		assertTrue(apps.size() == 1);
 		assertEquals(i, apps.get(0));
+
+		// check we don't get this item again after another request
+		apps = pas.getAppropriations(a1);
+		req = new Request(a1, i, new ArtifactTypeMatcher(Institution.class), 5);
+		session.insert(req);
+		session.incrementTime();
+
+		assertTrue(apps.size() == 1);
+
+		Institution i2 = new StubInstitution("i2");
+		session.insert(new Provision(a2, i, i2));
+		req = new Request(a1, i, new ArtifactTypeMatcher(Institution.class), 5);
+		session.insert(req);
+		session.incrementTime();
+
+		apps = pas.getAppropriations(a1);
+		assertTrue(apps.size() == 2);
+		assertEquals(i2, apps.get(1));
 	}
 }

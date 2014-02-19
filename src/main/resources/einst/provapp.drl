@@ -60,11 +60,13 @@ rule "Appropriate request"
 	salience -1
 	when
 		$req : Request($a : actor, $i : inst, $query : query, $lim : limit, valid == false)
-		$matched : ArrayList() from collect( Provision(actor != $a, valid == true, inst == $i, $query.matches(artifact)))
+		accumulate(
+			// provisions by other actors
+			(and Provision($p : this, actor != $a, valid == true, inst == $i, $query.matches(artifact), $item : artifact)
+			// have not yet been appropriated by $a
+			not Appropriate(artifact == $item, actor == $a, inst == $i, valid == true) );
+			$matched : collectList($p))
 	then
-		modify($req) {
-			setValid(true);
-		}
 		// limit appropriation count
 		int count = $matched.size();
 		if($lim > 0 && count > $lim)
@@ -74,6 +76,9 @@ rule "Appropriate request"
 			Appropriate app = new Appropriate($a, $i, ((Provision)$matched.get(i)).getArtifact());
 			app.setT($req.getT());
 			insert(app);
+		}
+		modify($req) {
+			setValid(true);
 		}
 end
 
