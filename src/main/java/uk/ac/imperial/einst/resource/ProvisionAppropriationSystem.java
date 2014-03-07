@@ -10,6 +10,7 @@ import org.drools.runtime.rule.ViewChangedEventListener;
 
 import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.EInstSession;
+import uk.ac.imperial.einst.Institution;
 import uk.ac.imperial.einst.Module;
 import uk.ac.imperial.einst.RuleResources;
 import uk.ac.imperial.einst.ipower.Pow;
@@ -66,7 +67,7 @@ public class ProvisionAppropriationSystem implements Module {
 
 		@Override
 		public void rowAdded(Row row) {
-			client.onAppropriation(row.get("item"));
+			client.onAppropriation(row.get("item"), (Institution) row.get("inst"));
 		}
 
 		@Override

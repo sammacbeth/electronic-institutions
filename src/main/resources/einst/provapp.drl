@@ -19,7 +19,7 @@ declare Appropriate
 end
 
 query getAppropriations(Actor a)
-	app : Appropriate(actor == a, valid == true, item : artifact)
+	app : Appropriate(actor == a, valid == true, item : artifact, inst : inst)
 end
 
 query getPowProvision(Actor a)
