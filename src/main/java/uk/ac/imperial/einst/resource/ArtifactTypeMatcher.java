@@ -11,12 +11,12 @@ public class ArtifactTypeMatcher implements ArtifactMatcher {
 
 	@Override
 	public boolean matches(Object artifact) {
-		return type.isInstance(artifact);
+		return type.isInstance(artifact) || type.equals(artifact);
 	}
 
 	/**
 	 * Non-standard equals - does not meet equals contract. This is a hack for
-	 * Provision equivalence.
+	 * filtered action equivalence.
 	 */
 	@Override
 	public boolean equals(Object obj) {
