@@ -12,7 +12,7 @@ public class Facility {
 	final double fixedCost;
 	final double marginalCost;
 
-	Facility(Institution inst, Set<Pool> pools, double sunkCost,
+	public Facility(Institution inst, Set<Pool> pools, double sunkCost,
 			double fixedCost, double marginalCost) {
 		super();
 		this.inst = inst;

@@ -12,6 +12,11 @@ public class Account {
 		this.balance = balance;
 	}
 
+	public Account(Object holder, double balance, double borrowLimit) {
+		this(holder, balance);
+		this.minValue = borrowLimit;
+	}
+
 	public Object getHolder() {
 		return holder;
 	}

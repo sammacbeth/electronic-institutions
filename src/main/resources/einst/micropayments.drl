@@ -16,6 +16,10 @@ query cleared(Transfer t)
 	Cleared(t := transfer)
 end
 
+query account(Object holder)
+	account : Account(holder := holder)
+end
+
 rule "Pay Invoice"
 	when
 		$i : Invoice($p : payer, $q : amount)
