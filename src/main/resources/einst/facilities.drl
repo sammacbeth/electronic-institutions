@@ -1,0 +1,41 @@
+import uk.ac.imperial.einst.Action
+import uk.ac.imperial.einst.Institution
+import uk.ac.imperial.einst.micropay.Invoice
+import uk.ac.imperial.einst.resource.Pool
+import uk.ac.imperial.einst.resource.facility.Facility
+
+import java.util.ArrayList
+
+global org.apache.log4j.Logger logger
+
+rule "Facility sunk costs"
+	when
+		$f : Facility($i : inst, $c : sunkCost)
+		Action($t : t)
+		not( exists( Action(t > $t) ) )
+		not( Invoice( payer == $i, payee == $f, ref == "sunk") )
+	then
+		insert( new Invoice($f, $i, "sunk", $c, $t) );
+end
+
+rule "Facility fixed costs"
+	when
+		$f : Facility($i : inst, $c : fixedCost)
+		Action($t : t)
+		not( Invoice( payer == $i, payee == $f, ref == "fixed", t == $t) )
+	then
+		insert( new Invoice($f, $i, "fixed", $c, $t) );
+end
+
+rule "Facility marginal costs"
+	when
+		$f : Facility($i : inst, $c : marginalCost, $pools : pools)
+		Action($t : t)
+		not( Invoice( payer == $i, payee == $f, ref == "marginal", t == $t) )
+		accumulate( $p : Pool($pools contains this, inst == $i, $n : artifacts.size());
+			$count : sum( $n ) )
+	then
+		insert( new Invoice($f, $i, "marginal", $c * $count.intValue(), $t ) );
+end
+
+
