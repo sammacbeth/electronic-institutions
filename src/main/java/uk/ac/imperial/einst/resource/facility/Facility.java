@@ -11,6 +11,7 @@ public class Facility {
 	final double sunkCost;
 	final double fixedCost;
 	final double marginalCost;
+	boolean active = true;
 
 	public Facility(Institution inst, Set<Pool> pools, double sunkCost,
 			double fixedCost, double marginalCost) {
@@ -42,11 +43,18 @@ public class Facility {
 		return marginalCost;
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	@Override
 	public String toString() {
-		return "facility(" + inst + ", " + pools + ", "
-				+ sunkCost + ", " + fixedCost + ", "
-				+ marginalCost + ")";
+		return "facility(" + inst + ", " + pools + ", " + sunkCost + ", "
+				+ fixedCost + ", " + marginalCost + ")";
 	}
 
 }

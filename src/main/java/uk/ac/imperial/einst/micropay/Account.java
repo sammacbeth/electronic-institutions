@@ -5,6 +5,7 @@ public class Account {
 	final Object holder;
 	double balance = 0;
 	double minValue = 0;
+	boolean frozen = false;
 
 	public Account(Object holder, double balance) {
 		super();
@@ -14,7 +15,7 @@ public class Account {
 
 	public Account(Object holder, double balance, double borrowLimit) {
 		this(holder, balance);
-		this.minValue = borrowLimit;
+		this.minValue = -borrowLimit;
 	}
 
 	public Object getHolder() {
@@ -31,6 +32,14 @@ public class Account {
 
 	public double getMinValue() {
 		return minValue;
+	}
+
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
 	}
 
 	@Override

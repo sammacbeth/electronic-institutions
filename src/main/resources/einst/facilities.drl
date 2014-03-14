@@ -20,7 +20,7 @@ end
 
 rule "Facility fixed costs"
 	when
-		$f : Facility($i : inst, $c : fixedCost)
+		$f : Facility($i : inst, $c : fixedCost, active == true)
 		Action($t : t)
 		not( Invoice( payer == $i, payee == $f, ref == "fixed", t == $t) )
 	then
@@ -29,7 +29,7 @@ end
 
 rule "Facility marginal costs"
 	when
-		$f : Facility($i : inst, $c : marginalCost, $pools : pools)
+		$f : Facility($i : inst, $c : marginalCost, $pools : pools, active == true)
 		Action($t : t)
 		not( Invoice( payer == $i, payee == $f, ref == "marginal", t == $t) )
 		accumulate( $p : Pool($pools contains this, inst == $i, $n : artifacts.size());

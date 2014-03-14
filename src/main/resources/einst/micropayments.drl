@@ -23,7 +23,7 @@ end
 rule "Pay Invoice"
 	when
 		$i : Invoice($p : payer, $q : amount)
-		$a : Account(holder == $p, $b : balance)
+		$a : Account(holder == $p, $b : balance, frozen == false)
 		not( Paid($i;) )
 	then
 		logger.info("Paying invoice: "+ $i );
@@ -36,8 +36,8 @@ end
 rule "Transfer"
 	when
 		$t: Transfer( $pr : actor, $pe : payee, $am : amount )
-		$ar : Account($br : balance, holder == $pr, minValue < $br - $am)
-		$ae : Account($be : balance, holder == $pe)
+		$ar : Account($br : balance, holder == $pr, minValue < $br - $am, frozen == false)
+		$ae : Account($be : balance, holder == $pe, frozen == false)
 	then
 		modify($ar) {
 			setBalance( $br - $am );
