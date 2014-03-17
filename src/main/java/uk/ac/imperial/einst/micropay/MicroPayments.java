@@ -73,6 +73,11 @@ public class MicroPayments implements Module {
 			return delegate.getMinValue();
 		}
 
+		@Override
+		public String toString() {
+			return delegate.toString();
+		}
+
 	}
 
 }
