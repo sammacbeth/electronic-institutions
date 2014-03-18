@@ -36,6 +36,7 @@ end
 rule "Transfer"
 	when
 		$t: Transfer( $pr : actor, $pe : payee, $am : amount )
+		not( Cleared($t;) )
 		$ar : Account($br : balance, holder == $pr, minValue < $br - $am, frozen == false)
 		$ae : Account($be : balance, holder == $pe, frozen == false)
 	then
