@@ -12,6 +12,10 @@ declare Cleared
 	transfer : Transfer
 end
 
+declare Bounced
+	transfer : Transfer
+end
+
 query cleared(Transfer t)
 	Cleared(t := transfer)
 end
@@ -36,15 +40,19 @@ end
 rule "Transfer"
 	when
 		$t: Transfer( $pr : actor, $pe : payee, $am : amount )
-		not( Cleared($t;) )
-		$ar : Account($br : balance, holder == $pr, minValue < $br - $am, frozen == false)
+		not( Cleared($t;) or Bounced($t;) )
+		$ar : Account($br : balance, holder == $pr, $min : minValue, frozen == false)
 		$ae : Account($be : balance, holder == $pe, frozen == false)
 	then
-		modify($ar) {
-			setBalance( $br - $am );
-		};
-		modify($ae) {
-			setBalance( $be + $am );
-		};
-		insert( new Cleared($t) );
+		if($min < $br - $am) {
+			modify($ar) {
+				setBalance( $br - $am );
+			};
+			modify($ae) {
+				setBalance( $be + $am );
+			};
+			insert( new Cleared($t) );
+		} else {
+			insert( new Bounced($t) );
+		}
 end

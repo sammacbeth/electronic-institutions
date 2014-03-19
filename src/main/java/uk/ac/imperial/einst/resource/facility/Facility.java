@@ -10,17 +10,20 @@ public class Facility {
 	final Set<Pool> pools;
 	final double sunkCost;
 	final double fixedCost;
-	final double marginalCost;
+	final double marginalStorageCost;
+	final double marginalTransactionCost;
 	boolean active = true;
 
 	public Facility(Institution inst, Set<Pool> pools, double sunkCost,
-			double fixedCost, double marginalCost) {
+			double fixedCost, double marginalStorageCost,
+			double marginalTransactionCost) {
 		super();
 		this.inst = inst;
 		this.pools = pools;
 		this.sunkCost = sunkCost;
 		this.fixedCost = fixedCost;
-		this.marginalCost = marginalCost;
+		this.marginalStorageCost = marginalStorageCost;
+		this.marginalTransactionCost = marginalTransactionCost;
 	}
 
 	public Institution getInst() {
@@ -39,8 +42,12 @@ public class Facility {
 		return fixedCost;
 	}
 
-	public double getMarginalCost() {
-		return marginalCost;
+	public double getMarginalStorageCost() {
+		return marginalStorageCost;
+	}
+
+	public double getMarginalTransactionCost() {
+		return marginalTransactionCost;
 	}
 
 	public boolean isActive() {
@@ -54,7 +61,8 @@ public class Facility {
 	@Override
 	public String toString() {
 		return "facility(" + inst + ", " + pools + ", " + sunkCost + ", "
-				+ fixedCost + ", " + marginalCost + ")";
+				+ fixedCost + ", " + marginalStorageCost + ", "
+				+ marginalTransactionCost + ")";
 	}
 
 }

@@ -37,7 +37,7 @@ public class FacilityTest extends SpecificationTest {
 						Object.class));
 		Set<Pool> pools = new HashSet<Pool>();
 		pools.add(pool);
-		Facility fac = new Facility(i, pools, 10, 5, 0.1);
+		Facility fac = new Facility(i, pools, 10, 5, 0.1, 0.1);
 		session.insert(pool);
 		session.insert(fac);
 		session.insert(new Account(i, 0));

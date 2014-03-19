@@ -1,6 +1,7 @@
 import uk.ac.imperial.einst.Action
 import uk.ac.imperial.einst.Institution
 import uk.ac.imperial.einst.micropay.Invoice
+import uk.ac.imperial.einst.resource.Appropriate
 import uk.ac.imperial.einst.resource.Pool
 import uk.ac.imperial.einst.resource.facility.Facility
 
@@ -27,15 +28,26 @@ rule "Facility fixed costs"
 		insert( new Invoice($f, $i, "fixed", $c, $t) );
 end
 
-rule "Facility marginal costs"
+rule "Facility marginal storage costs"
+	salience -10
 	when
-		$f : Facility($i : inst, $c : marginalCost, $pools : pools, active == true)
+		$f : Facility($i : inst, $c : marginalStorageCost, $pools : pools, active == true)
 		Action($t : t)
-		not( Invoice( payer == $i, payee == $f, ref == "marginal", t == $t) )
+		not( Invoice( payer == $i, payee == $f, ref == "marginalStorage", t == $t) )
 		accumulate( $p : Pool($pools contains this, inst == $i, $n : artifacts.size());
 			$count : sum( $n ) )
 	then
-		insert( new Invoice($f, $i, "marginal", $c * $count.intValue(), $t ) );
+		insert( new Invoice($f, $i, "marginalStorage", $c * $count.intValue(), $t ) );
 end
 
-
+rule "Facility marginal transaction costs"
+	salience -10
+	when
+		$f : Facility($i : inst, $c : marginalTransactionCost, $pools : pools, active == true)
+		Action($t : t)
+		not( Invoice( payer == $i, payee == $f, ref == "marginalTransaction", t == $t) )
+		accumulate( $a : Appropriate( t == $t, valid == true ); $count : count($a) )
+	then
+		logger.info($count + " appropriate actions");
+		insert( new Invoice($f, $i, "marginalTransaction", $c * $count.intValue(), $t ) );
+end
