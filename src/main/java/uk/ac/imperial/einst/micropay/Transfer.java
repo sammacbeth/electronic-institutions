@@ -29,7 +29,7 @@ public class Transfer extends Action {
 
 	@Override
 	public String toString() {
-		return "transfer("+ getActor() +", " + payee + ", " + amount + ")";
+		return "transfer("+ getActor() +", " + payee + ", " + amount + ")" + toStringSuffix();
 	}
 
 }
