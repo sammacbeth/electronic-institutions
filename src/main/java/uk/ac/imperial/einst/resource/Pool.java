@@ -11,15 +11,18 @@ public class Pool {
 	final Institution inst;
 	final Set<String> contribRoles;
 	final Set<String> extractRoles;
+	final Set<String> removalRoles;
 	final ArtifactMatcher artifactMatcher;
 	final List<Object> artifacts = new LinkedList<Object>();
 
 	public Pool(Institution inst, Set<String> contribRoles,
-			Set<String> extractRoles, ArtifactMatcher artifactMatcher) {
+			Set<String> extractRoles, Set<String> removalRoles,
+			ArtifactMatcher artifactMatcher) {
 		super();
 		this.inst = inst;
 		this.contribRoles = contribRoles;
 		this.extractRoles = extractRoles;
+		this.removalRoles = removalRoles;
 		this.artifactMatcher = artifactMatcher;
 	}
 
@@ -33,6 +36,10 @@ public class Pool {
 
 	public Set<String> getExtractRoles() {
 		return extractRoles;
+	}
+
+	public Set<String> getRemovalRoles() {
+		return removalRoles;
 	}
 
 	public ArtifactMatcher getArtifactMatcher() {

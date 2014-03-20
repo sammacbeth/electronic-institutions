@@ -40,7 +40,8 @@ public class ProvAppTest extends SpecificationTest {
 		contribRoles.add("test");
 
 		Pool pool = new Pool(i, contribRoles, Collections.<String> emptySet(),
-				new ArtifactTypeMatcher(Object.class));
+				Collections.<String> emptySet(), new ArtifactTypeMatcher(
+						Object.class));
 		session.insert(pool);
 
 		Provision p = new Provision(a, i, new Object());
@@ -84,9 +85,11 @@ public class ProvAppTest extends SpecificationTest {
 		Set<String> contribRoles = new HashSet<String>();
 		contribRoles.add("test");
 		Pool p1 = new Pool(i, contribRoles, Collections.<String> emptySet(),
-				new ArtifactTypeMatcher(Institution.class));
+				Collections.<String> emptySet(), new ArtifactTypeMatcher(
+						Institution.class));
 		Pool p2 = new Pool(i, contribRoles, Collections.<String> emptySet(),
-				new ArtifactTypeMatcher(Actor.class));
+				Collections.<String> emptySet(), new ArtifactTypeMatcher(
+						Actor.class));
 
 		session.insert(r);
 		session.insert(p1);
@@ -131,7 +134,8 @@ public class ProvAppTest extends SpecificationTest {
 		Set<String> contribRoles = new HashSet<String>();
 		contribRoles.add("test");
 		Pool p1 = new Pool(i, contribRoles, contribRoles,
-				new ArtifactTypeMatcher(Institution.class));
+				Collections.<String> emptySet(), new ArtifactTypeMatcher(
+						Institution.class));
 
 		session.insert(r1);
 		session.insert(r2);

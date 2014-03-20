@@ -33,6 +33,7 @@ public class FacilityTest extends SpecificationTest {
 
 		Institution i = new StubInstitution("i");
 		Pool pool = new Pool(i, Collections.<String> emptySet(),
+				Collections.<String> emptySet(),
 				Collections.<String> emptySet(), new ArtifactTypeMatcher(
 						Object.class));
 		Set<Pool> pools = new HashSet<Pool>();
@@ -44,11 +45,11 @@ public class FacilityTest extends SpecificationTest {
 		session.insert(new Action(new StubActor("a"), i) {
 		});
 		session.incrementTime();
-		
+
 		session.insert(new Action(new StubActor("a"), i) {
 		});
 		session.incrementTime();
-		
+
 		// TODO proper checking of invoices.
 	}
 

@@ -64,7 +64,9 @@ rule "Appropriate request"
 			// provisions by other actors
 			(and Provision($p : this, actor != $a, valid == true, inst == $i, $query.matches(artifact), $item : artifact)
 			// have not yet been appropriated by $a
-			not Appropriate(artifact == $item, actor == $a, inst == $i, valid == true) );
+			not Appropriate(artifact == $item, actor == $a, inst == $i, valid == true)
+			// are in the pool
+			Pool(inst == $i, artifacts contains $item) );
 			$matched : collectList($p))
 	then
 		// limit appropriation count
@@ -86,6 +88,7 @@ rule "Appropriate"
 	when
 		$app : Appropriate($a : actor, $i : inst, $item : artifact, valid == false)
 		Provision(inst == $i, artifact == $item, valid == true, this before $app)
+		Pool(inst == $i, artifacts contains $item)
 		Pow(actor == $a, this.matches($app), this before[-1s] $app )
 	then
 		modify($app) {
