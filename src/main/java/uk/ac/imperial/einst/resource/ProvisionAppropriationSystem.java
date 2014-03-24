@@ -67,7 +67,8 @@ public class ProvisionAppropriationSystem implements Module {
 
 		@Override
 		public void rowAdded(Row row) {
-			client.onAppropriation(row.get("item"), (Institution) row.get("inst"));
+			client.onAppropriation(row.get("item"),
+					(Institution) row.get("inst"));
 		}
 
 		@Override

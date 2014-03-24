@@ -4,6 +4,8 @@ import uk.ac.imperial.einst.ipower.Pow
 import uk.ac.imperial.einst.resource.Appropriate
 import uk.ac.imperial.einst.resource.Pool
 import uk.ac.imperial.einst.resource.Provision
+import uk.ac.imperial.einst.resource.Prune
+import uk.ac.imperial.einst.resource.Remove
 import uk.ac.imperial.einst.resource.Request
 
 import java.util.ArrayList
@@ -15,6 +17,10 @@ declare Provision
 end
 
 declare Appropriate
+	@role( event )
+end
+
+declare Remove
 	@role( event )
 end
 
@@ -102,4 +108,51 @@ rule "Pow Appropriate"
 		Pool(inst == $i, extractRoles contains $r, $type : artifactMatcher)
 	then
 		insertLogical( new Pow($a, new Appropriate($a, $i, $type)));
+end
+
+rule "Pow Remove"
+	when
+		RoleOf($a : actor, $r : role, $i : inst)
+		Pool(inst == $i, removalRoles contains $r, $type : artifactMatcher)
+	then
+		insertLogical( new Pow($a, new Remove($a, $i, $type)));
+end
+
+rule "Remove artifact from pool"
+	when
+		$rem : Remove($a : actor, $i : inst, $item : artifact, valid == false)
+		Pow(actor == $a, this.matches($rem), this before[-1s] $rem )
+		$p : Pool(inst == $i, artifacts.contains($item))
+	then
+		modify($p) {
+			getArtifacts().remove($item);
+		}
+		modify($rem) {
+			setValid(true);
+		}
+end
+
+rule "Prune request"
+	when
+		$req : Prune($a : actor, $i : inst, $query : query, $before : before, $lim : limit, valid == false)
+		accumulate(
+			// provisions 
+			(and Provision($p : this, valid == true, inst == $i, $query.matches(artifact), $item : artifact, ($before == 0 || t < $before))
+			// are in the pool
+			Pool(inst == $i, artifacts contains $item) );
+			$matched : collectList($p))
+	then
+		// limit appropriation count
+		int count = $matched.size();
+		if($lim > 0 && count > $lim)
+			count = $lim;
+		// appropriate matched
+		for(int i=0; i< count; i++) {
+			Remove rem = new Remove($a, $i, ((Provision)$matched.get(i)).getArtifact());
+			rem.setT($req.getT());
+			insert(rem);
+		}
+		modify($req) {
+			setValid(true);
+		}
 end

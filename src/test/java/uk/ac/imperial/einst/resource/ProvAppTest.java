@@ -121,7 +121,7 @@ public class ProvAppTest extends SpecificationTest {
 
 	@Test
 	public void testAppropriateRequest() throws UnavailableModuleException {
-		session.LOG_WM = true;
+		session.LOG_WM = false;
 		ProvisionAppropriationSystem pas = session
 				.getModule(ProvisionAppropriationSystem.class);
 		IPower ipow = session.getModule(IPower.class);
@@ -178,5 +178,92 @@ public class ProvAppTest extends SpecificationTest {
 		apps = pas.getAppropriations(a1);
 		assertTrue(apps.size() == 2);
 		assertEquals(i2, apps.get(1));
+	}
+
+	@Test
+	public void testRemoval() {
+		Institution i = new StubInstitution("i1");
+		Actor a1 = new StubActor("a1");
+		RoleOf r1 = new RoleOf(a1, i, "test");
+		Set<String> roles = new HashSet<String>();
+		roles.add("test");
+
+		Pool p1 = new Pool(i, roles, Collections.<String> emptySet(), roles,
+				new ArtifactTypeMatcher(Institution.class));
+
+		session.insert(r1);
+		session.insert(p1);
+		session.insert(new Provision(a1, i, i));
+		session.incrementTime();
+
+		assertTrue(p1.getArtifacts().contains(i));
+
+		session.insert(new Remove(a1, i, i));
+		session.incrementTime();
+
+		assertFalse(p1.getArtifacts().contains(i));
+	}
+
+	@Test
+	public void testRemovalWithoutPower() {
+		Institution i = new StubInstitution("i1");
+		Actor a1 = new StubActor("a1");
+		RoleOf r1 = new RoleOf(a1, i, "test");
+		Set<String> roles = new HashSet<String>();
+		roles.add("test");
+
+		Pool p1 = new Pool(i, roles, Collections.<String> emptySet(),
+				Collections.<String> emptySet(), new ArtifactTypeMatcher(
+						Institution.class));
+
+		session.insert(r1);
+		session.insert(p1);
+		session.insert(new Provision(a1, i, i));
+		session.incrementTime();
+
+		assertTrue(p1.getArtifacts().contains(i));
+
+		session.insert(new Remove(a1, i, i));
+		session.incrementTime();
+
+		assertTrue(p1.getArtifacts().contains(i));
+	}
+
+	@Test
+	public void testPrune() {
+		session.LOG_WM = false;
+		Institution i = new StubInstitution("i1");
+		Actor a1 = new StubActor("a1");
+		Actor a2 = new StubActor("a2");
+		RoleOf r1 = new RoleOf(a1, i, "test");
+		RoleOf r2 = new RoleOf(a2, i, "test");
+		Set<String> roles = new HashSet<String>();
+		roles.add("test");
+
+		Pool p1 = new Pool(i, roles, Collections.<String> emptySet(), roles,
+				new ArtifactTypeMatcher(String.class));
+		session.insert(r1);
+		session.insert(r2);
+		session.insert(p1);
+		session.insert(new Provision(a1, i, "1"));
+		session.insert(new Provision(a2, i, "2"));
+		session.incrementTime();
+
+		assertEquals(2, p1.getArtifacts().size());
+
+		session.insert(new Prune(a1, i, ArtifactMatcher.ALL, 0, 0));
+		session.incrementTime();
+
+		assertEquals(0, p1.getArtifacts().size());
+
+		session.insert(new Provision(a1, i, "3"));
+		session.incrementTime();
+		session.insert(new Provision(a1, i, "4"));
+		session.incrementTime();
+		session.insert(new Prune(a1, i, ArtifactMatcher.ALL, 3, 0));
+		session.incrementTime();
+
+		assertEquals(1, p1.getArtifacts().size());
+		assertTrue(p1.getArtifacts().contains("4"));
 	}
 }
