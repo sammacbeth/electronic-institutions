@@ -36,12 +36,8 @@ public class ProvAppTest extends SpecificationTest {
 		Actor a = new StubActor("a1");
 		RoleOf r = new RoleOf(a, i, "test");
 
-		Set<String> contribRoles = new HashSet<String>();
-		contribRoles.add("test");
-
-		Pool pool = new Pool(i, contribRoles, Collections.<String> emptySet(),
-				Collections.<String> emptySet(), new ArtifactTypeMatcher(
-						Object.class));
+		Pool pool = new Pool(i, RoleOf.roleSet("test"), RoleOf.roleSet(),
+				RoleOf.roleSet(), new ArtifactTypeMatcher(Object.class));
 		session.insert(pool);
 
 		Provision p = new Provision(a, i, new Object());
@@ -82,8 +78,7 @@ public class ProvAppTest extends SpecificationTest {
 		Institution i = new StubInstitution("i1");
 		Actor a = new StubActor("a1");
 		RoleOf r = new RoleOf(a, i, "test");
-		Set<String> contribRoles = new HashSet<String>();
-		contribRoles.add("test");
+		Set<String> contribRoles = RoleOf.roleSet("test");
 		Pool p1 = new Pool(i, contribRoles, Collections.<String> emptySet(),
 				Collections.<String> emptySet(), new ArtifactTypeMatcher(
 						Institution.class));
@@ -131,8 +126,7 @@ public class ProvAppTest extends SpecificationTest {
 		RoleOf r1 = new RoleOf(a1, i, "test");
 		Actor a2 = new StubActor("a2");
 		RoleOf r2 = new RoleOf(a2, i, "test");
-		Set<String> contribRoles = new HashSet<String>();
-		contribRoles.add("test");
+		Set<String> contribRoles = RoleOf.roleSet("test");
 		Pool p1 = new Pool(i, contribRoles, contribRoles,
 				Collections.<String> emptySet(), new ArtifactTypeMatcher(
 						Institution.class));
@@ -185,8 +179,7 @@ public class ProvAppTest extends SpecificationTest {
 		Institution i = new StubInstitution("i1");
 		Actor a1 = new StubActor("a1");
 		RoleOf r1 = new RoleOf(a1, i, "test");
-		Set<String> roles = new HashSet<String>();
-		roles.add("test");
+		Set<String> roles = RoleOf.roleSet("test");
 
 		Pool p1 = new Pool(i, roles, Collections.<String> emptySet(), roles,
 				new ArtifactTypeMatcher(Institution.class));
@@ -209,8 +202,7 @@ public class ProvAppTest extends SpecificationTest {
 		Institution i = new StubInstitution("i1");
 		Actor a1 = new StubActor("a1");
 		RoleOf r1 = new RoleOf(a1, i, "test");
-		Set<String> roles = new HashSet<String>();
-		roles.add("test");
+		Set<String> roles = RoleOf.roleSet("test");
 
 		Pool p1 = new Pool(i, roles, Collections.<String> emptySet(),
 				Collections.<String> emptySet(), new ArtifactTypeMatcher(
@@ -237,8 +229,7 @@ public class ProvAppTest extends SpecificationTest {
 		Actor a2 = new StubActor("a2");
 		RoleOf r1 = new RoleOf(a1, i, "test");
 		RoleOf r2 = new RoleOf(a2, i, "test");
-		Set<String> roles = new HashSet<String>();
-		roles.add("test");
+		Set<String> roles = RoleOf.roleSet("test");
 
 		Pool p1 = new Pool(i, roles, Collections.<String> emptySet(), roles,
 				new ArtifactTypeMatcher(String.class));
