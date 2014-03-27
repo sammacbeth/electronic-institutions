@@ -1,7 +1,6 @@
 package uk.ac.imperial.einst.access;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -144,6 +143,42 @@ public class AccessTest extends SpecificationTest {
 		Set<String> roles = acmod.getRoles(a, i);
 		assertTrue(roles.size() == 1);
 		assertTrue(roles.contains("test"));
+	}
+
+	@Test
+	public void testResign() throws UnavailableModuleException {
+		Actor a = new StubActor("A");
+		Actor g = new StubActor("G");
+		Institution i = new StubInstitution("I");
+		RoleOf r = new RoleOf(g, i, AccessControl.GATEKEEPER);
+		ACMethod ac = new ACMethod(i, "test", ACMethod.NONE);
+		AccessControl acmod = session.getModule(AccessControl.class);
+
+		session.insert(r);
+		session.insert(ac);
+		session.incrementTime();
+
+		Apply app = new Apply(a, i, "test");
+		session.insert(app);
+
+		session.incrementTime();
+		assertTrue(app.isValid());
+
+		Assign ass = new Assign(g, a, i, "test");
+		session.insert(ass);
+		session.incrementTime();
+
+		Set<String> roles = acmod.getRoles(a, i);
+		assertTrue(roles.size() == 1);
+		assertTrue(roles.contains("test"));
+
+		Resign res = new Resign(a, i, "test");
+		session.insert(res);
+		session.incrementTime();
+
+		assertTrue(res.isValid());
+		roles = acmod.getRoles(a, i);
+		assertEquals(0, roles.size());
 	}
 
 }

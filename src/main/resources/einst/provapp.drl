@@ -8,20 +8,31 @@ import uk.ac.imperial.einst.resource.Prune
 import uk.ac.imperial.einst.resource.Remove
 import uk.ac.imperial.einst.resource.Request
 
+import java.util.List
 import java.util.ArrayList
+import java.util.LinkedList
 
 global org.apache.log4j.Logger logger
 
 declare Provision
 	@role( event )
+	@expires( 1d )
 end
-
 declare Appropriate
 	@role( event )
+	@expires( 1d )
 end
-
 declare Remove
 	@role( event )
+	@expires( 2s )
+end
+declare Request
+	@role( event )
+	@expires( 2s )
+end
+declare Prune
+	@role( event )
+	@expires( 2s )
 end
 
 query getAppropriations(Actor a)
@@ -156,3 +167,4 @@ rule "Prune request"
 			setValid(true);
 		}
 end
+

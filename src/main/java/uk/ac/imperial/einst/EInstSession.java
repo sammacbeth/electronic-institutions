@@ -4,9 +4,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -20,6 +22,7 @@ import org.drools.builder.CompositeKnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.conf.EventProcessingOption;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -46,6 +49,7 @@ public class EInstSession {
 	int t = 0;
 	protected Set<Module> modules;
 	List<LiveQuery> queries = new LinkedList<LiveQuery>();
+	Map<Integer, List<Action>> actionLog = new HashMap<Integer, List<Action>>();
 
 	/**
 	 * Create an Electronic Institution session with the given modules. Module
@@ -69,6 +73,7 @@ public class EInstSession {
 		super();
 		// get rule files needed for modules and create session
 		Set<String> ruleFiles = new HashSet<String>();
+		ruleFiles.add("einst/util.drl");
 		for (Class<? extends Module> m : modules) {
 			RuleResources deps = m.getAnnotation(RuleResources.class);
 			if (deps != null) {
@@ -118,7 +123,7 @@ public class EInstSession {
 		// retraction
 		KnowledgeBaseConfiguration baseConf = KnowledgeBaseFactory
 				.newKnowledgeBaseConfiguration();
-		// baseConf.setOption(EventProcessingOption.STREAM);
+		baseConf.setOption(EventProcessingOption.STREAM);
 
 		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(baseConf);
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
@@ -132,6 +137,7 @@ public class EInstSession {
 		session = kbase.newStatefulKnowledgeSession(sessionConf, null);
 		clock = session.getSessionClock();
 		session.setGlobal("logger", logger);
+		session.setGlobal("einst", this);
 	}
 
 	/**
@@ -145,7 +151,9 @@ public class EInstSession {
 		if (LOG_WM) {
 			logger.info("Session:");
 			for (Object o : getObjects()) {
-				logger.info(o.toString());
+				String str = o.toString();
+				if (Character.isLowerCase(str.charAt(0)))
+					logger.info(str);
 			}
 			logger.info("-----");
 		}
@@ -214,6 +222,28 @@ public class EInstSession {
 		});
 		wm.addAll(session.getObjects());
 		return wm;
+	}
+
+	public void logAction(Action a) {
+		int t = a.getT();
+		if (!actionLog.containsKey(t)) {
+			actionLog.put(t, new LinkedList<Action>());
+		}
+		actionLog.get(t).add(a);
+	}
+
+	public Map<Integer, List<Action>> getActionLog() {
+		return actionLog;
+	}
+
+	public void printActionLog() {
+		logger.info("Action Log:");
+		for (List<Action> al : actionLog.values()) {
+			for (Action a : al) {
+				logger.info(a);
+			}
+		}
+		logger.info("-----");
 	}
 
 }

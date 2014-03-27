@@ -1,0 +1,20 @@
+import uk.ac.imperial.einst.Action
+
+global uk.ac.imperial.einst.EInstSession einst
+
+declare Action
+	@role( event )
+end
+
+declare Logged
+	action : Action
+end
+
+rule "Log Actions"
+	when
+		$a : Action()
+		not( Logged($a;) )
+	then
+		einst.logAction($a);
+		insert(new Logged($a));
+end

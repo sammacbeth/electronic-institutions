@@ -116,7 +116,6 @@ public class ProvAppTest extends SpecificationTest {
 
 	@Test
 	public void testAppropriateRequest() throws UnavailableModuleException {
-		session.LOG_WM = false;
 		ProvisionAppropriationSystem pas = session
 				.getModule(ProvisionAppropriationSystem.class);
 		IPower ipow = session.getModule(IPower.class);
@@ -172,6 +171,7 @@ public class ProvAppTest extends SpecificationTest {
 		apps = pas.getAppropriations(a1);
 		assertTrue(apps.size() == 2);
 		assertEquals(i2, apps.get(1));
+
 	}
 
 	@Test
@@ -223,7 +223,6 @@ public class ProvAppTest extends SpecificationTest {
 
 	@Test
 	public void testPrune() {
-		session.LOG_WM = false;
 		Institution i = new StubInstitution("i1");
 		Actor a1 = new StubActor("a1");
 		Actor a2 = new StubActor("a2");

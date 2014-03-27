@@ -19,6 +19,23 @@ import java.util.Set
 
 global org.apache.log4j.Logger logger
 
+declare OpenBallot 
+	@role( event )
+	@expires( 2s )
+end
+declare CloseBallot 
+	@role( event )
+	@expires( 2s )
+end
+declare Vote 
+	@role( event )
+	@expires( 2s )
+end
+declare Declare 
+	@role( event )
+	@expires( 2s )
+end
+
 query getOpenBallot(Institution inst, Issue issue)
 	//Issue(this == issue, inst := inst)
 	ballot : Ballot(issue == issue, status == Ballot.Status.OPEN, issue.inst == inst)

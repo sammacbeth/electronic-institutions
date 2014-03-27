@@ -16,6 +16,11 @@ declare Bounced
 	transfer : Transfer
 end
 
+declare Transfer
+	@role( event )
+	@expires( 2s )
+end
+
 query cleared(Transfer t)
 	Cleared(t := transfer)
 end

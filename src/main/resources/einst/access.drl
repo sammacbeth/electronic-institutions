@@ -4,6 +4,7 @@ import uk.ac.imperial.einst.access.Assign
 import uk.ac.imperial.einst.access.AccessControl
 import uk.ac.imperial.einst.access.ACMethod
 import uk.ac.imperial.einst.access.RoleOf
+import uk.ac.imperial.einst.access.Resign
 
 import uk.ac.imperial.einst.ipower.Obl
 import uk.ac.imperial.einst.ipower.Pow
@@ -12,9 +13,15 @@ global org.apache.log4j.Logger logger
 
 declare Apply
 	@role( event )
+	@expires( 2s )
 end
 declare Assign
 	@role( event )
+	@expires( 2s )
+end
+declare Resign
+	@role( event )
+	@expires( 2s )
 end
 
 rule "Validate application"
@@ -55,4 +62,15 @@ rule "Pow + Obl assign none"
 		Assign act = new Assign($g, $a, $i, $r);
 		insertLogical( new Pow($g, act ) );
 		insert( new Obl($g, act ) );
+end
+
+rule "Resign"
+	when
+		$res : Resign($a : actor, $i : inst, $r : role, valid == false)
+		$ro : RoleOf(actor == $a, inst == $i, role == $r)
+	then
+		retract($ro);
+		modify($res) {
+			setValid(true);
+		}
 end
