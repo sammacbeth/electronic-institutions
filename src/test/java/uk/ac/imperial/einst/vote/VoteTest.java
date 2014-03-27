@@ -141,11 +141,13 @@ public class VoteTest extends SpecificationTest {
 		assertTrue(obls.get(0).getAction()
 				.equalsIgnoreT(new Declare(h, i, b, "aye")));
 
-		session.insert(new Declare(h, i, b, "aye"));
+		Declare d = new Declare(h, i, b, "aye");
+		session.insert(d);
 		session.incrementTime();
 
 		obls = ipow.getObligations(h);
 		assertTrue(obls.get(0).isDone());
+		assertTrue(d.isValid());
 	}
 
 	@Test

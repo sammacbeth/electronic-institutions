@@ -20,7 +20,7 @@ public class OpenBallot extends Action {
 	@Override
 	public String toString() {
 		return "openBallot(" + getActor() + ", " + getInst() + ", "
-				+ issue.getName() + ")";
+				+ issue.getName() + ")" + toStringSuffix();
 	}
 
 }

@@ -18,6 +18,6 @@ public class CloseBallot extends Action {
 
 	@Override
 	public String toString() {
-		return "closeBallot(" + ballot + ")";
+		return "closeBallot(" + ballot + ")" + toStringSuffix();
 	}
 }

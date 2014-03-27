@@ -106,6 +106,18 @@ rule "Obl Declare Winner"
 		insert( new Obl($a, d));
 end
 
+rule "Validate declaration"
+	when
+		$d : Declare($a : actor, $b : ballot, $i : inst, $w : winner, valid == false )
+		VoteResult(ballot == $b, winner == $w)
+		Ballot( this == $b, closedBy == $a )
+		not( Declare( ballot == $b, valid == true ) )
+	then
+		modify($d) {
+			setValid(true);
+		}
+end
+
 rule "Plurality Winner Determination"
 	when
 		$b : Ballot(status == Ballot.Status.CLOSED, wdm == Plurality.NAME)
