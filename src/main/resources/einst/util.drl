@@ -1,4 +1,5 @@
 import uk.ac.imperial.einst.Action
+import uk.ac.imperial.einst.T
 
 global uk.ac.imperial.einst.EInstSession einst
 
@@ -8,6 +9,24 @@ end
 
 declare Logged
 	action : Action
+end
+
+rule "Create T"
+	when
+	then
+		insert(new T());
+end
+
+rule "Update T"
+	salience 1000
+	when
+		Action($t : t)
+		$tt : T(t < $t)
+		not( exists( Action(t > $t) ))
+	then
+		modify($tt) {
+			setT($t)
+		}
 end
 
 rule "Log Actions"
