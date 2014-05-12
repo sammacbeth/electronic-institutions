@@ -18,7 +18,7 @@ end
 
 declare Transfer
 	@role( event )
-	@expires( 2s )
+	@expires( 11s )
 end
 
 query cleared(Transfer t)
