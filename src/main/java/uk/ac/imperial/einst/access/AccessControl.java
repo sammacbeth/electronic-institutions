@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.drools.runtime.ObjectFilter;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.QueryResultsRow;
 
 import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.EInstSession;
@@ -64,6 +65,14 @@ public class AccessControl implements Module {
 			roles.add(((RoleOf) o).getRole());
 		}
 		return roles;
+	}
+
+	public Set<Actor> getActorsInRole(String role,Institution i) {
+		final Set<Actor> actors = new HashSet<Actor>();
+		for(QueryResultsRow row : session.getQueryResults("hasRole", role, i)) {
+			actors.add((Actor) row.get("a"));
+		}
+		return actors;
 	}
 
 }

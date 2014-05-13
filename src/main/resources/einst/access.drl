@@ -1,3 +1,5 @@
+import uk.ac.imperial.einst.Institution
+
 import uk.ac.imperial.einst.access.Apply
 import uk.ac.imperial.einst.access.Assign
 
@@ -22,6 +24,10 @@ end
 declare Resign
 	@role( event )
 	@expires( 2s )
+end
+
+query hasRole(String role, Institution i)
+	RoleOf( a: actor, inst == i, role == role )
 end
 
 rule "Validate application"
