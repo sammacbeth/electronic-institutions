@@ -24,7 +24,7 @@ public class Vote extends Action {
 
 	@Override
 	public String toString() {
-		return "vote(" + getActor() + ", " + getInst() + ", " + ballot + ", "
+		return "vote(" + getActor() + ", " + getInst() + ", " + ballot.getIssue().getName() + ", "
 				+ vote + ")" + toStringSuffix();
 	}
 

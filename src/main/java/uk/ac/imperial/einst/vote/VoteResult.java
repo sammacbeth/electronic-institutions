@@ -46,7 +46,7 @@ public class VoteResult {
 
 	@Override
 	public String toString() {
-		return "voteResult(" + ballot + ", " + invalid + " invalid, " + scores
+		return "voteResult(" + ballot.getIssue().getName() + ", " + invalid + " invalid, " + scores
 				+ ")";
 	}
 
