@@ -1,10 +1,13 @@
 package uk.ac.imperial.einst.micropay;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.drools.runtime.rule.QueryResultsRow;
+import org.drools.runtime.rule.Variable;
 
 import uk.ac.imperial.einst.EInstSession;
 import uk.ac.imperial.einst.Module;
@@ -32,6 +35,17 @@ public class MicroPayments implements Module {
 			return new WrappedAccount((Account) rowIt.next().get("account"));
 		}
 		return null;
+	}
+
+	public Set<Account> getAccounts() {
+		Iterator<QueryResultsRow> rowIt = session.getQueryResults("account",
+				Variable.v).iterator();
+		Set<Account> accounts = new HashSet<Account>();
+		while (rowIt.hasNext()) {
+			accounts.add(new WrappedAccount((Account) rowIt.next().get(
+					"account")));
+		}
+		return accounts;
 	}
 
 	public Account createAccount(Object holder, double balance, double limit) {

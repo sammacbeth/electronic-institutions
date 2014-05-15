@@ -40,8 +40,8 @@ public class Plurality {
 			for (Vote v : votes) {
 				if (v.getVote() instanceof Preferences) {
 					voteValues.addAll(((Preferences) v.getVote()).getList());
-				}
-				invalidVotes++;
+				} else
+					invalidVotes++;
 			}
 		} else {
 			for (Vote v : votes) {
