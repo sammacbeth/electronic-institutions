@@ -44,7 +44,7 @@ end
 
 rule "Transfer"
 	when
-		$t: Transfer( $pr : actor, $pe : payee, $am : amount )
+		$t: Transfer( $pr : payer, $pe : payee, $am : amount )
 		not( Cleared($t;) or Bounced($t;) )
 		$ar : Account($br : balance, holder == $pr, $min : minValue, frozen == false)
 		$ae : Account($be : balance, holder == $pe, frozen == false)
