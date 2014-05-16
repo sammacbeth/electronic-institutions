@@ -1,5 +1,6 @@
 package uk.ac.imperial.einst.resource;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +14,7 @@ public class Pool {
 	final Set<String> extractRoles;
 	final Set<String> removalRoles;
 	final ArtifactMatcher artifactMatcher;
-	final List<Object> artifacts = new LinkedList<Object>();
+	final Set<Object> artifacts = new HashSet<Object>();
 
 	public Pool(Institution inst, Set<String> contribRoles,
 			Set<String> extractRoles, Set<String> removalRoles,
@@ -46,7 +47,7 @@ public class Pool {
 		return artifactMatcher;
 	}
 
-	public List<Object> getArtifacts() {
+	public Set<Object> getArtifacts() {
 		return artifacts;
 	}
 
