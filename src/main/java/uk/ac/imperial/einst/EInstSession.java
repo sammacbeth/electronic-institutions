@@ -1,8 +1,20 @@
 package uk.ac.imperial.einst;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +35,7 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.conf.EventProcessingOption;
+import org.drools.definition.KnowledgePackage;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.KnowledgeSessionConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
@@ -41,6 +54,7 @@ import org.drools.time.SessionPseudoClock;
 public class EInstSession {
 
 	public boolean LOG_WM = false;
+	public static boolean USE_KB_CACHE = false;
 
 	private final Logger logger = Logger.getLogger(EInstSession.class);
 	protected StatefulKnowledgeSession session;
@@ -106,27 +120,84 @@ public class EInstSession {
 		createSession(this.kbase);
 	}
 
+	@SuppressWarnings("unchecked")
 	static KnowledgeBase buildKnowledgeBase(String... ruleFiles) {
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
-				.newKnowledgeBuilder();
-		CompositeKnowledgeBuilder ckbuilder = kbuilder.batch();
-		for (String file : ruleFiles) {
-			ckbuilder.add(ResourceFactory.newClassPathResource(file,
-					EInstSession.class.getClass()), ResourceType.DRL);
+		final Logger logger = Logger.getLogger(EInstSession.class);
+		List<String> fileList = Arrays.asList(ruleFiles);
+		Collections.sort(fileList);
+		Collection<KnowledgePackage> packages = null;
+		long rulesLastModified = 0;
+		File cacheFile = null;
+
+		if (USE_KB_CACHE) {
+			String aggString = "";
+			for (String file : fileList) {
+				aggString += file;
+				URL uri = EInstSession.class.getClassLoader().getResource(file);
+				long mtime = new File(uri.getFile()).lastModified();
+				if (mtime > rulesLastModified)
+					rulesLastModified = mtime;
+			}
+			String cacheFileName = "einst_kbcache_"
+					+ Long.toHexString(Math.abs(aggString.hashCode()));
+			cacheFile = new File(cacheFileName);
+			if (cacheFile.exists()
+					&& cacheFile.lastModified() >= rulesLastModified) {
+				// cache hit
+				try {
+					InputStream is = new FileInputStream(cacheFile);
+					ObjectInputStream ois = new ObjectInputStream(is);
+					packages = (Collection<KnowledgePackage>) ois.readObject();
+					ois.close();
+					is.close();
+				} catch (FileNotFoundException e) {
+					logger.warn("Error loading from cache", e);
+				} catch (IOException e) {
+					logger.warn("Could not read cached kb", e);
+				} catch (ClassNotFoundException e) {
+					logger.warn("Error loading from cache", e);
+				}
+
+			}
 		}
-		ckbuilder.build();
-		if (kbuilder.hasErrors()) {
-			System.err.println(kbuilder.getErrors().toString());
-			throw new RuntimeException("Drools compile errors");
+		// if no pre-cached packages, compile rule resources
+		if (packages == null) {
+			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
+					.newKnowledgeBuilder();
+			CompositeKnowledgeBuilder ckbuilder = kbuilder.batch();
+			for (String file : ruleFiles) {
+				ckbuilder.add(ResourceFactory.newClassPathResource(file,
+						EInstSession.class.getClass()), ResourceType.DRL);
+			}
+			ckbuilder.build();
+			if (kbuilder.hasErrors()) {
+				System.err.println(kbuilder.getErrors().toString());
+				throw new RuntimeException("Drools compile errors");
+			}
+			packages = kbuilder.getKnowledgePackages();
+
+			if (USE_KB_CACHE) {
+				try {
+					OutputStream os = new FileOutputStream(cacheFile);
+					ObjectOutputStream oos = new ObjectOutputStream(os);
+					oos.writeObject(packages);
+					oos.close();
+					os.close();
+				} catch (FileNotFoundException e) {
+					logger.warn("Unable to open cache file " + cacheFile, e);
+				} catch (IOException e) {
+					logger.warn("Unable to write cache file " + cacheFile, e);
+				}
+			}
 		}
-		// drools fusion config - disabled because of aggressive event
-		// retraction
+
+		// drools fusion config
 		KnowledgeBaseConfiguration baseConf = KnowledgeBaseFactory
 				.newKnowledgeBaseConfiguration();
 		baseConf.setOption(EventProcessingOption.STREAM);
 
 		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(baseConf);
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+		kbase.addKnowledgePackages(packages);
 		return kbase;
 	}
 
