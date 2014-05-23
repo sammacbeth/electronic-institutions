@@ -1,7 +1,5 @@
 package uk.ac.imperial.einst.access;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.imperial.einst.Actor;
@@ -74,12 +72,22 @@ public class RoleOf {
 		return "role_of(" + actor + ", " + inst + ", " + role + ")";
 	}
 
+	/**
+	 * Moved to {@link Roles#set(String...)}
+	 * @param roles
+	 * @return
+	 */
 	public static Set<String> roleSet(String... roles) {
-		Set<String> roleSet = new HashSet<String>();
-		for (String r : roles) {
-			roleSet.add(r);
-		}
-		return Collections.unmodifiableSet(roleSet);
+		return Roles.set(roles);
+	}
+	
+	/**
+	 * Moved to {@link Roles#union(Set...)}
+	 * @param roleSets
+	 * @return
+	 */
+	public static Set<String> union(Set<String>... roleSets) {
+		return Roles.union(roleSets);
 	}
 
 }
