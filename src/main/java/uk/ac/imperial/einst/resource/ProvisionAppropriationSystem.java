@@ -1,5 +1,6 @@
 package uk.ac.imperial.einst.resource;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,6 +57,16 @@ public class ProvisionAppropriationSystem implements Module {
 		}
 		return pows;
 	}
+	
+	public PoolUsage getPoolUsage(Actor a, Pool p, int since) {
+		Iterator<QueryResultsRow> it = session.getQueryResults("getPoolUsage", a, p, since).iterator();
+		if(it.hasNext()) {
+			QueryResultsRow row = it.next();
+			return new PoolUsage(Integer.parseInt(row.get("provCount").toString()), Integer.parseInt(row.get("appCount").toString()));
+		} else {
+			return new PoolUsage(0, 0);
+		}
+	}
 
 	class AppListener implements ViewChangedEventListener {
 		final AppropriationsListener client;
@@ -78,6 +89,18 @@ public class ProvisionAppropriationSystem implements Module {
 		@Override
 		public void rowUpdated(Row row) {
 		}
+	}
+
+	static public class PoolUsage {
+		final public int provisions;
+		final public int appropriations;
+
+		public PoolUsage(int provisions, int appropriations) {
+			super();
+			this.provisions = provisions;
+			this.appropriations = appropriations;
+		}
+
 	}
 
 }

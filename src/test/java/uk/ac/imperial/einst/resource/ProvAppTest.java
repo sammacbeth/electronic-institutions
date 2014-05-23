@@ -19,6 +19,7 @@ import uk.ac.imperial.einst.StubInstitution;
 import uk.ac.imperial.einst.UnavailableModuleException;
 import uk.ac.imperial.einst.access.RoleOf;
 import uk.ac.imperial.einst.ipower.IPower;
+import uk.ac.imperial.einst.resource.ProvisionAppropriationSystem.PoolUsage;
 
 public class ProvAppTest extends SpecificationTest {
 
@@ -172,6 +173,9 @@ public class ProvAppTest extends SpecificationTest {
 		assertTrue(apps.size() == 2);
 		assertEquals(i2, apps.get(1));
 
+		PoolUsage use = pas.getPoolUsage(a1, p1, 0);
+		assertEquals(0, use.provisions);
+		assertEquals(2, use.appropriations);
 	}
 
 	@Test

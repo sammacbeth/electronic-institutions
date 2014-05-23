@@ -39,6 +39,13 @@ query getAppropriations(Actor a)
 	app : Appropriate(actor == a, valid == true, item : artifact, inst : inst)
 end
 
+query getPoolUsage(Actor a, Pool p, int since)
+	accumulate( Provision($prov : this, actor == a, valid == true, t >= since) and Pool.Added(pool == p, prov == $prov);
+			provCount : count($prov))
+	accumulate( Appropriate($app : this, actor == a, valid == true, t >= since, $item : artifact) and Pool(this == p, artifacts contains $item);
+			appCount : count($app))
+end
+
 query getPowProvision(Actor a)
 	Pow(actor == a, act : action, this.matches(new Provision(a, null, null)))
 end
