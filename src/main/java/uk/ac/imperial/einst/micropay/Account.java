@@ -1,11 +1,16 @@
 package uk.ac.imperial.einst.micropay;
 
+import java.util.NoSuchElementException;
+import java.util.Vector;
+
 public class Account {
 
 	final Object holder;
 	double balance = 0;
 	double minValue = 0;
 	boolean frozen = false;
+	Vector<Double> balanceHistory = new Vector<Double>();
+	int historySize = 20;
 
 	public Account(Object holder, double balance) {
 		super();
@@ -47,4 +52,19 @@ public class Account {
 		return "account(" + holder + ", " + balance + ")";
 	}
 
+	public void snapshot() {
+		balanceHistory.add(0, this.balance);
+		if (balanceHistory.size() > historySize) {
+			balanceHistory.setSize(historySize);
+		}
+	}
+
+	public double getProfit() {
+		try {
+			return (this.balance - balanceHistory.lastElement())
+					/ balanceHistory.size();
+		} catch (NoSuchElementException e) {
+			return 0;
+		}
+	}
 }

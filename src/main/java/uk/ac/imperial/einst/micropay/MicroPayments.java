@@ -92,6 +92,11 @@ public class MicroPayments implements Module {
 			return delegate.toString();
 		}
 
+		@Override
+		public double getProfit() {
+			return delegate.getProfit();
+		}
+
 	}
 
 }

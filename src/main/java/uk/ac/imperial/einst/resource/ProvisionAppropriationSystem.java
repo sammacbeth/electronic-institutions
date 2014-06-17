@@ -57,14 +57,18 @@ public class ProvisionAppropriationSystem implements Module {
 		}
 		return pows;
 	}
-	
+
 	public PoolUsage getPoolUsage(Actor a, Pool p, int since) {
-		Iterator<QueryResultsRow> it = session.getQueryResults("getPoolUsage", a, p, since).iterator();
-		if(it.hasNext()) {
+		Iterator<QueryResultsRow> it = session.getQueryResults("getPoolUsage",
+				a, p, since).iterator();
+		if (it.hasNext()) {
 			QueryResultsRow row = it.next();
-			return new PoolUsage(Integer.parseInt(row.get("provCount").toString()), Integer.parseInt(row.get("appCount").toString()));
+			return new PoolUsage(Integer.parseInt(row.get("provCount")
+					.toString()), Integer.parseInt(row.get("appCount")
+					.toString()), Integer.parseInt(row.get("provUsedCount")
+					.toString()));
 		} else {
-			return new PoolUsage(0, 0);
+			return new PoolUsage(0, 0, 0);
 		}
 	}
 
@@ -94,11 +98,14 @@ public class ProvisionAppropriationSystem implements Module {
 	static public class PoolUsage {
 		final public int provisions;
 		final public int appropriations;
+		final public int provisionsAppropriated;
 
-		public PoolUsage(int provisions, int appropriations) {
+		public PoolUsage(int provisions, int appropriations,
+				int provisionsAppropriated) {
 			super();
 			this.provisions = provisions;
 			this.appropriations = appropriations;
+			this.provisionsAppropriated = provisionsAppropriated;
 		}
 
 	}

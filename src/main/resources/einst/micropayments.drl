@@ -1,3 +1,5 @@
+import uk.ac.imperial.einst.T
+
 import uk.ac.imperial.einst.micropay.Account
 import uk.ac.imperial.einst.micropay.Invoice
 import uk.ac.imperial.einst.micropay.Transfer
@@ -60,4 +62,28 @@ rule "Transfer"
 		} else {
 			insert( new Bounced($t) );
 		}
+end
+
+declare Snapshot
+	t : int
+	account : Account
+end
+
+rule "Account history"
+	salience 1000
+	when
+		T($t : t)
+		$a : Account()
+		not( Snapshot($t, $a;) )
+	then
+		$a.snapshot();
+		insert( new Snapshot($t, $a));
+end
+
+rule "Prune snapshots"
+	when
+		T($t : t)
+		$s : Snapshot(t < $t)
+	then
+		retract($s);
 end

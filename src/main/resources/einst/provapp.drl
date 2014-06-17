@@ -44,6 +44,10 @@ query getPoolUsage(Actor a, Pool p, int since)
 			provCount : count($prov))
 	accumulate( Appropriate($app : this, actor == a, valid == true, t >= since, $item : artifact) and Pool(this == p, artifacts contains $item);
 			appCount : count($app))
+	accumulate( Provision($prov : this, actor == a, valid == true, $item : artifact) 
+				and Pool.Added(pool == p, prov == $prov) 
+				and Appropriate($app : this, valid == true, t >= since, artifact == $item);
+			provUsedCount : count($app))
 end
 
 query getPowProvision(Actor a)
