@@ -1,8 +1,11 @@
 import uk.ac.imperial.einst.T
+import uk.ac.imperial.einst.Actor
 
 import uk.ac.imperial.einst.micropay.Account
 import uk.ac.imperial.einst.micropay.Invoice
 import uk.ac.imperial.einst.micropay.Transfer
+
+import uk.ac.imperial.einst.ipower.Obl
 
 global org.apache.log4j.Logger logger
 
@@ -31,6 +34,18 @@ query account(Object holder)
 	account : Account(holder := holder)
 end
 
+query debt(Object holder)
+	Transfer( $tr: this, payer == holder, $am : amount )
+	not( Cleared(transfer == $tr) )
+	not( Bounced(transfer == $tr) )
+end
+
+query owed(Object holder, double amount)
+	Transfer( $t: this, payee == holder, amount := amount )
+	not( Cleared(transfer == $t) )
+	not( Bounced(transfer == $t) )
+end
+
 rule "Pay Invoice"
 	when
 		$i : Invoice($p : payer, $q : amount)
@@ -51,16 +66,27 @@ rule "Transfer"
 		$ar : Account($br : balance, holder == $pr, $min : minValue, frozen == false)
 		$ae : Account($be : balance, holder == $pe, frozen == false)
 	then
+		double balanceAvail = $br - $min;
+		double toPay = $am;
+		if(balanceAvail < 0) {
+			toPay = 0;
+		} else if(balanceAvail < toPay) {
+			toPay = balanceAvail;
+		}
+		//logger.info($pr +" pays "+ $pe +" "+ $am +" (" + $t +")");
+		modify($ar) {
+			setBalance( $br - toPay );
+		};
+		modify($ae) {
+			setBalance( $be + toPay );
+		};
 		if($min < $br - $am) {
-			modify($ar) {
-				setBalance( $br - $am );
-			};
-			modify($ae) {
-				setBalance( $be + $am );
-			};
 			insert( new Cleared($t) );
 		} else {
 			insert( new Bounced($t) );
+			if($pr instanceof Actor) {
+				insert( new Obl( (Actor) $pr, new Transfer((Actor) $pr, $t.getInst(), $pe, $am - toPay) ) );
+			}
 		}
 end
 

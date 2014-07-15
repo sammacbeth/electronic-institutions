@@ -53,6 +53,16 @@ public class MicroPayments implements Module {
 		session.insert(a);
 		return new WrappedAccount(a);
 	}
+	
+	public double getDebt(Object accountHolder) {
+		Iterator<QueryResultsRow> rowIt = session.getQueryResults("debt", accountHolder).iterator();
+		double debt = 0;
+		while (rowIt.hasNext()) {
+			QueryResultsRow row = rowIt.next();
+			debt += ((Number) row.get("$am")).doubleValue();
+		}
+		return debt;
+	}
 
 	class WrappedAccount extends Account {
 
