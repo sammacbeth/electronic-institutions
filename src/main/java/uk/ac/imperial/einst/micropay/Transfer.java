@@ -12,6 +12,7 @@ public class Transfer extends Action {
 	final Object payee;
 	final double amount;
 	final long tid;
+	double toPay;
 
 	static AtomicLong idCounter = new AtomicLong();
 
@@ -21,6 +22,7 @@ public class Transfer extends Action {
 		this.payee = payee;
 		this.amount = amount;
 		this.tid = idCounter.getAndIncrement();
+		this.toPay = amount;
 	}
 
 	public Transfer(Actor actor, Object payee, double amount) {
@@ -33,6 +35,7 @@ public class Transfer extends Action {
 		this.payee = payee;
 		this.amount = amount;
 		this.tid = idCounter.getAndIncrement();
+		this.toPay = amount;
 	}
 
 	public static Transfer merge(Transfer t1, Transfer t2) {
@@ -58,6 +61,14 @@ public class Transfer extends Action {
 
 	public double getAmount() {
 		return amount;
+	}
+
+	public double getToPay() {
+		return toPay;
+	}
+
+	public void setToPay(double toPay) {
+		this.toPay = toPay;
 	}
 
 	@Override

@@ -60,34 +60,36 @@ rule "Pay Invoice"
 end
 
 rule "Transfer"
+	no-loop
 	when
-		$t: Transfer( $pr : payer, $pe : payee, $am : amount )
-		not( Cleared($t;) or Bounced($t;) )
+		$t: Transfer( $pr : payer, $pe : payee, $tp : toPay, toPay > 0 )
 		$ar : Account($br : balance, holder == $pr, $min : minValue, frozen == false)
 		$ae : Account($be : balance, holder == $pe, frozen == false)
 	then
 		double balanceAvail = $br - $min;
-		double toPay = $am;
+		double payNow = $tp;
 		if(balanceAvail < 0) {
-			toPay = 0;
-		} else if(balanceAvail < toPay) {
-			toPay = balanceAvail;
+			payNow = 0;
+		} else if(balanceAvail < payNow) {
+			payNow = balanceAvail;
 		}
-		//logger.info($pr +" pays "+ $pe +" "+ $am +" (" + $t +")");
+		logger.info($pr +" pays "+ $pe +" "+ payNow +" from "+ balanceAvail +" (" + $t +")");
 		modify($ar) {
-			setBalance( $br - toPay );
+			setBalance( $br - payNow );
 		};
 		modify($ae) {
-			setBalance( $be + toPay );
+			setBalance( $be + payNow );
 		};
-		if($min < $br - $am) {
-			insert( new Cleared($t) );
-		} else {
-			insert( new Bounced($t) );
-			if($pr instanceof Actor) {
-				insert( new Obl( (Actor) $pr, new Transfer((Actor) $pr, $t.getInst(), $pe, $am - toPay) ) );
-			}
-		}
+		modify($t) {
+			setToPay($tp - payNow);
+		};
+end
+
+rule "Cleared"
+	when
+		$t : Transfer( toPay <= 0 )
+	then
+		insert(new Cleared($t));
 end
 
 declare Snapshot

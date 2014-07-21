@@ -45,6 +45,7 @@ public class PayTest extends SpecificationTest {
 		assertTrue(pay.isCleared(t1));
 		assertEquals(5, aa.getBalance(), 0.0001);
 		assertEquals(5, ai.getBalance(), 0.0001);
+		
 	}
 
 }
