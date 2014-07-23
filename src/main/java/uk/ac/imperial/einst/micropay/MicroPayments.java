@@ -56,12 +56,10 @@ public class MicroPayments implements Module {
 	
 	public double getDebt(Object accountHolder) {
 		Iterator<QueryResultsRow> rowIt = session.getQueryResults("debt", accountHolder).iterator();
-		double debt = 0;
-		while (rowIt.hasNext()) {
-			QueryResultsRow row = rowIt.next();
-			debt += ((Number) row.get("$am")).doubleValue();
+		if(rowIt.hasNext()) {
+			return ((Number) rowIt.next().get("$debt")).doubleValue();
 		}
-		return debt;
+		return 0;
 	}
 
 	class WrappedAccount extends Account {

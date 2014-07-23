@@ -35,18 +35,17 @@ query account(Object holder)
 end
 
 query debt(Object holder)
-	Transfer( $tr: this, payer == holder, $am : amount )
-	not( Cleared(transfer == $tr) )
-	not( Bounced(transfer == $tr) )
+	accumulate( Transfer( payer == holder, $am : toPay );
+		$debt : sum($am))
 end
 
-query owed(Object holder, double amount)
-	Transfer( $t: this, payee == holder, amount := amount )
-	not( Cleared(transfer == $t) )
-	not( Bounced(transfer == $t) )
+query owed(Object holder)
+	accumulate( Transfer( payee == holder, $am : toPay );
+		$owed : sum($am))
 end
 
 rule "Pay Invoice"
+	salience -10
 	when
 		$i : Invoice($p : payer, $q : amount)
 		$a : Account(holder == $p, $b : balance, frozen == false)
