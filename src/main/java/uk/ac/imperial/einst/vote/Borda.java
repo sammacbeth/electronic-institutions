@@ -38,12 +38,12 @@ public class Borda {
 			for (int k = 0; k < prefs.size(); k++) {
 				Object opt = prefs.get(k);
 				if (optionIdx.containsKey(opt)) {
-					bordaRank[optionIdx.get(opt)] += n - k;
+					bordaRank[optionIdx.get(opt)] += v.weight * (n - k);
 				}
 			}
 		}
 
-		VoteResult res = new VoteResult(ballot);
+		VoteResult res = new VoteResult(ballot, true);
 		res.setInvalidCount(invalidVotes);
 		for (int i = 0; i < bordaRank.length; i++) {
 			res.setScore(validOptions[i], bordaRank[i]);

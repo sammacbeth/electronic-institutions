@@ -3,6 +3,7 @@ package uk.ac.imperial.einst.vote;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 public class VoteResult {
@@ -16,9 +17,16 @@ public class VoteResult {
 	private int best = 0;
 	private Set<Object> leaders = new HashSet<Object>();
 
+	final boolean tieBreakRand;
+	Object winner = NO_WINNER;
+
 	public VoteResult(Ballot ballot) {
-		super();
+		this(ballot, false);
+	}
+
+	public VoteResult(Ballot ballot, boolean tieBreakRand) {
 		this.ballot = ballot;
+		this.tieBreakRand = tieBreakRand;
 	}
 
 	void setInvalidCount(int invalidVotes) {
@@ -37,7 +45,23 @@ public class VoteResult {
 	}
 
 	public Object getWinner() {
-		return leaders.size() == 1 ? leaders.iterator().next() : NO_WINNER;
+		if(leaders.contains(winner))
+			return winner;
+		else if (leaders.size() == 1) {
+			winner = leaders.iterator().next();
+			return winner;
+		} else if (tieBreakRand) {
+			int element = new Random().nextInt(leaders.size());
+			int i = 0;
+			for (Object o : leaders) {
+				if (i == element) {
+					winner = o;
+					return winner;
+				}
+				i++;
+			}
+		}
+		return NO_WINNER;
 	}
 
 	public Ballot getBallot() {
@@ -46,8 +70,8 @@ public class VoteResult {
 
 	@Override
 	public String toString() {
-		return "voteResult(" + ballot.getIssue().getName() + ", " + invalid + " invalid, " + scores
-				+ ")";
+		return "voteResult(" + ballot.getIssue().getName() + ", " + invalid
+				+ " invalid, " + scores + ")";
 	}
 
 }
