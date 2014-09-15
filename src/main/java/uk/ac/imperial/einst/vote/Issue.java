@@ -1,6 +1,5 @@
 package uk.ac.imperial.einst.vote;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import uk.ac.imperial.einst.Institution;
@@ -62,8 +61,7 @@ public class Issue {
 	@Override
 	public String toString() {
 		return "issue(" + inst + ", " + name + ", " + cfvRoles + ", "
-				+ voteRoles + ", " + method + ", "
-				+ Arrays.toString(voteValues) + ", " + wdm + ")";
+				+ voteRoles + ", " + method + ", " + wdm + ")";
 	}
 
 }
