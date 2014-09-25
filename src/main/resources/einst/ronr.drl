@@ -1,6 +1,7 @@
 import uk.ac.imperial.einst.Institution
 
 import uk.ac.imperial.einst.access.RoleOf
+import uk.ac.imperial.einst.access.Qualifies
 
 import uk.ac.imperial.einst.ipower.Obl
 import uk.ac.imperial.einst.ipower.Pow
@@ -245,6 +246,46 @@ rule "Pow close session"
 		Session(inst == $i, sitting == true, $name : name)
 	then
 		insertLogical(new Pow($c, new CloseSession($c, $i, $name)));
+end
+
+/*****************************
+ * ROLE ASSIGNMENT (SORT OF) *
+ ****************************/
+
+rule "Assign seconders"
+	when
+		T($t : t)
+		Propose($a : actor, $i : inst, valid == true, t == $t)
+		Qualifies($b : actor, role == "seconder", actor != $a)
+	then
+		insert( new RoleOf($b, $i, "seconder") );
+end
+
+rule "Unassign seconders"
+	when
+		T($t : t)
+		Second($i : inst, valid == true, t == $t)
+		$r : RoleOf(role == "seconder", inst == $i)
+	then
+		retract($r);
+end
+
+rule "Assign proposers"
+	when
+		T($t : t)
+		OpenSession($i : inst, valid == true, t == $t)
+		Qualifies($a : actor, role == "proposer")
+	then
+		insert( new RoleOf($a, $i, "proposer") );
+end
+
+rule "Unassign proposers"
+	when
+		T($t : t)
+		CloseSession($i : inst, valid == true, t == $t)
+		$r : RoleOf(role == "proposer", inst == $i)
+	then
+		retract($r);
 end
 
 /*****************************

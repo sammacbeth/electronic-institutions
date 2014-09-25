@@ -14,6 +14,7 @@ import uk.ac.imperial.einst.SpecificationTest;
 import uk.ac.imperial.einst.StubActor;
 import uk.ac.imperial.einst.StubInstitution;
 import uk.ac.imperial.einst.UnavailableModuleException;
+import uk.ac.imperial.einst.access.Qualifies;
 import uk.ac.imperial.einst.access.RoleOf;
 import uk.ac.imperial.einst.ipower.IPower;
 import uk.ac.imperial.einst.ronr.Motion.Status;
@@ -74,10 +75,8 @@ public class RonrTest extends SpecificationTest {
 		// open session
 		session.insert(i);
 		session.insert(new RoleOf(c, i, "chair"));
-		session.insert(new RoleOf(p, i, "proposer")); // TODO should be
-														// qualifies
-		session.insert(new RoleOf(s, i, "seconder")); // TODO should be
-														// qualifies
+		session.insert(new RoleOf(p, i, "proposer"));
+		session.insert(new RoleOf(s, i, "seconder"));
 		session.insert(new RoleOf(c, i, "voter"));
 		session.insert(new RoleOf(p, i, "voter"));
 		session.insert(new RoleOf(s, i, "voter"));
@@ -105,41 +104,122 @@ public class RonrTest extends SpecificationTest {
 		assertFalse(ipow.pow(p, new Second(p, m)));
 		session.insert(sec);
 		session.incrementTime();
-		
+
 		assertTrue(sec.isValid());
 		assertEquals(Motion.Status.Seconded, m.getStatus());
-		
+
 		OpenBallot ob = new OpenBallot(c, m);
 		assertTrue(ipow.pow(c, ob));
 		session.insert(ob);
 		session.incrementTime();
-		
+
 		assertTrue(ob.isValid());
 		assertEquals(Motion.Status.Voting, m.getStatus());
 		assertEquals(4, m.getVoting());
-		
-		Vote v = new Vote(s,m,Choice.NAY);
+
+		Vote v = new Vote(s, m, Choice.NAY);
 		assertTrue(ipow.pow(s, v));
-		assertTrue(ipow.pow(p, new Vote(p,m,Choice.AYE)));
-		assertFalse(ipow.pow(c, new Vote(c,m,Choice.AYE)));
+		assertTrue(ipow.pow(p, new Vote(p, m, Choice.AYE)));
+		assertFalse(ipow.pow(c, new Vote(c, m, Choice.AYE)));
 		session.insert(v);
 		session.incrementTime();
-		
+
 		assertTrue(v.isValid());
 		assertFalse(ipow.pow(s, v));
 		CloseBallot cb = new CloseBallot(c, m);
 		assertTrue(ipow.pow(c, cb));
 		session.insert(cb);
-		
+
 		session.incrementTime();
-		
+
 		Declare d = new Declare(c, m, Status.NotCarried);
 		assertTrue(ipow.pow(c, d));
 		session.insert(d);
-		
+
 		assertEquals(1, m.nays);
 		assertEquals(0, m.ayes);
-		
+
+		session.incrementTime();
+	}
+
+	@Test
+	public void testRoleAssignment() throws UnavailableModuleException {
+		session.LOG_WM = true;
+		RONR ronr = session.getModule(RONR.class);
+		IPower ipow = session.getModule(IPower.class);
+
+		Institution i = new StubInstitution("I");
+		Actor c = new StubActor("C");
+		Actor p = new StubActor("P");
+		Actor s = new StubActor("S");
+
+		// open session
+		session.insert(i);
+		session.insert(new RoleOf(c, i, "chair"));
+		session.insert(new Qualifies(p, "proposer"));
+		session.insert(new Qualifies(s, "seconder"));
+		session.insert(new RoleOf(c, i, "voter"));
+		session.insert(new RoleOf(p, i, "voter"));
+		session.insert(new RoleOf(s, i, "voter"));
+		session.incrementTime();
+
+		OpenSession os = new OpenSession(c, i, "sesh");
+		session.insert(os);
+		session.incrementTime();
+
+		Session sesh = ronr.getSession(i, "sesh");
+		Propose prop = new Propose(p, new Motion(sesh, "m1"));
+		assertTrue(ipow.pow(p, prop));
+		assertFalse(ipow.pow(c, new Propose(c, new Motion(sesh, "m1"))));
+		assertFalse(ipow.pow(s, new Propose(s, new Motion(sesh, "m1"))));
+		session.insert(prop);
+		session.incrementTime();
+
+		assertTrue(prop.isValid());
+		Motion m = ronr.getMotion(i, "sesh", "m1");
+		assertEquals(Motion.Status.Proposed, m.getStatus());
+
+		Second sec = new Second(s, m);
+		assertTrue(ipow.pow(s, sec));
+		assertFalse(ipow.pow(c, new Second(c, m)));
+		assertFalse(ipow.pow(p, new Second(p, m)));
+		session.insert(sec);
+		session.incrementTime();
+
+		assertTrue(sec.isValid());
+		assertEquals(Motion.Status.Seconded, m.getStatus());
+
+		OpenBallot ob = new OpenBallot(c, m);
+		assertTrue(ipow.pow(c, ob));
+		session.insert(ob);
+		session.incrementTime();
+
+		assertTrue(ob.isValid());
+		assertEquals(Motion.Status.Voting, m.getStatus());
+		assertEquals(4, m.getVoting());
+
+		Vote v = new Vote(s, m, Choice.NAY);
+		assertTrue(ipow.pow(s, v));
+		assertTrue(ipow.pow(p, new Vote(p, m, Choice.AYE)));
+		assertFalse(ipow.pow(c, new Vote(c, m, Choice.AYE)));
+		session.insert(v);
+		session.incrementTime();
+
+		assertTrue(v.isValid());
+		assertFalse(ipow.pow(s, v));
+		CloseBallot cb = new CloseBallot(c, m);
+		assertTrue(ipow.pow(c, cb));
+		session.insert(cb);
+
+		session.incrementTime();
+
+		Declare d = new Declare(c, m, Status.NotCarried);
+		assertTrue(ipow.pow(c, d));
+		session.insert(d);
+
+		assertEquals(1, m.nays);
+		assertEquals(0, m.ayes);
+
 		session.incrementTime();
 	}
 
