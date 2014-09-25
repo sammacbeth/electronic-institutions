@@ -101,8 +101,39 @@ public abstract class Action {
 	public static boolean equalsIgnoreNull(Object o1, Object o2) {
 		if (o1 == null || o2 == null)
 			return true;
-		else
-			return o1.equals(o2);
+		if (o1.equals(o2))
+			return true;
+		boolean inspect = o1.getClass().isAnnotationPresent(Inspectable.class)
+				&& o2.getClass().isAnnotationPresent(Inspectable.class);
+		if (!inspect)
+			return false;
+
+		try {
+			BeanInfo b1 = Introspector.getBeanInfo(o1.getClass());
+			BeanInfo b2 = Introspector.getBeanInfo(o2.getClass());
+			// cache property descriptors
+			Map<String, PropertyDescriptor> pdIdx = new HashMap<String, PropertyDescriptor>();
+			for (PropertyDescriptor pd1 : b1.getPropertyDescriptors()) {
+				pdIdx.put(pd1.getName(), pd1);
+			}
+			// compare class properties.
+			for (PropertyDescriptor pd2 : b2.getPropertyDescriptors()) {
+				PropertyDescriptor pd1 = pdIdx.get(pd2.getName());
+				if (pd1 == null
+						|| !equalsIgnoreNull(pd1.getReadMethod().invoke(o1),
+								pd2.getReadMethod().invoke(o2)))
+					return false;
+			}
+		} catch (IntrospectionException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+		return true;
 	}
 
 	protected String toStringSuffix() {
