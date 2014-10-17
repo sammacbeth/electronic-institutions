@@ -1,4 +1,6 @@
-package uk.ac.imperial.einst;
+package uk.ac.imperial.einst.util;
+
+import uk.ac.imperial.einst.Institution;
 
 public class StubInstitution implements Institution {
 

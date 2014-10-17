@@ -10,12 +10,12 @@ import uk.ac.imperial.einst.Action;
 import uk.ac.imperial.einst.Institution;
 import uk.ac.imperial.einst.Module;
 import uk.ac.imperial.einst.SpecificationTest;
-import uk.ac.imperial.einst.StubActor;
-import uk.ac.imperial.einst.StubInstitution;
 import uk.ac.imperial.einst.micropay.Account;
 import uk.ac.imperial.einst.micropay.MicroPayments;
 import uk.ac.imperial.einst.resource.ArtifactTypeMatcher;
 import uk.ac.imperial.einst.resource.Pool;
+import uk.ac.imperial.einst.util.StubActor;
+import uk.ac.imperial.einst.util.StubInstitution;
 
 public class FacilityTest extends SpecificationTest {
 

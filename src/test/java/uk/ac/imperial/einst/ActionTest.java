@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import uk.ac.imperial.einst.access.Apply;
+import uk.ac.imperial.einst.util.StubActor;
+import uk.ac.imperial.einst.util.StubInstitution;
 
 public class ActionTest {
 

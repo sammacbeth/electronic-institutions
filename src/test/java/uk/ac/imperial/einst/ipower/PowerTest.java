@@ -12,12 +12,12 @@ import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.Institution;
 import uk.ac.imperial.einst.Module;
 import uk.ac.imperial.einst.SpecificationTest;
-import uk.ac.imperial.einst.StubActor;
-import uk.ac.imperial.einst.StubInstitution;
 import uk.ac.imperial.einst.UnavailableModuleException;
 import uk.ac.imperial.einst.resource.Appropriate;
 import uk.ac.imperial.einst.resource.ArtifactTypeMatcher;
 import uk.ac.imperial.einst.resource.Provision;
+import uk.ac.imperial.einst.util.StubActor;
+import uk.ac.imperial.einst.util.StubInstitution;
 
 public class PowerTest extends SpecificationTest {
 

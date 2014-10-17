@@ -14,12 +14,12 @@ import uk.ac.imperial.einst.Actor;
 import uk.ac.imperial.einst.Institution;
 import uk.ac.imperial.einst.Module;
 import uk.ac.imperial.einst.SpecificationTest;
-import uk.ac.imperial.einst.StubActor;
-import uk.ac.imperial.einst.StubInstitution;
 import uk.ac.imperial.einst.UnavailableModuleException;
 import uk.ac.imperial.einst.access.RoleOf;
 import uk.ac.imperial.einst.ipower.IPower;
 import uk.ac.imperial.einst.resource.ProvisionAppropriationSystem.PoolUsage;
+import uk.ac.imperial.einst.util.StubActor;
+import uk.ac.imperial.einst.util.StubInstitution;
 
 public class ProvAppTest extends SpecificationTest {
 
