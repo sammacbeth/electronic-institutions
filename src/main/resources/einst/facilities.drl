@@ -46,7 +46,7 @@ rule "Facility marginal transaction costs"
 		$f : Facility($i : inst, $c : marginalTransactionCost, $pools : pools, active == true)
 		T($t : t)
 		not( Invoice( payer == $i, payee == $f, ref == "marginalTransaction", t == $t) )
-		accumulate( $a : Appropriate( t == $t, valid == true ); $count : count($a) )
+		accumulate( $a : Appropriate( t == $t, inst == $i, valid == true ); $count : count($a) )
 	then
 		logger.info($count + " appropriate actions");
 		insert( new Invoice($f, $i, "marginalTransaction", $c * $count.intValue(), $t ) );

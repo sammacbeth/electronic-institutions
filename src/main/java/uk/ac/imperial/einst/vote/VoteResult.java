@@ -39,7 +39,7 @@ public class VoteResult {
 			best = score;
 			leaders.clear();
 			leaders.add(opt);
-		} else if (score == best) {
+		} else if (score == best && best > 0) {
 			leaders.add(opt);
 		}
 	}
@@ -50,7 +50,7 @@ public class VoteResult {
 		else if (leaders.size() == 1) {
 			winner = leaders.iterator().next();
 			return winner;
-		} else if (tieBreakRand) {
+		} else if (tieBreakRand && leaders.size() > 0) {
 			int element = new Random().nextInt(leaders.size());
 			int i = 0;
 			for (Object o : leaders) {

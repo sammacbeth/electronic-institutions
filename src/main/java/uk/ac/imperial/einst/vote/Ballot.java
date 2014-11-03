@@ -69,7 +69,7 @@ public class Ballot {
 	public String toString() {
 		return "ballot(" + status + ", " + issue.getInst() + ", "
 				+ issue.getName() + ", " + started + ", " + voteRoles + ", "
-				+ Arrays.toString(options) + ", " + wdm + ")";
+				+ wdm + ")";
 	}
 
 }
