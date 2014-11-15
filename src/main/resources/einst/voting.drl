@@ -14,6 +14,7 @@ import uk.ac.imperial.einst.vote.Plurality
 import uk.ac.imperial.einst.vote.Vote
 import uk.ac.imperial.einst.vote.VoteResult
 import uk.ac.imperial.einst.vote.Borda
+import uk.ac.imperial.einst.vote.InstantRunoff
 
 import java.util.Set
 
@@ -151,4 +152,13 @@ rule "Borda Winner Determination"
 		$votes : Set() from collect( Vote(ballot == $b, valid == true))
 	then
 		insert(Borda.determineWinner($b, $votes));
+end
+
+rule "Instant runoff Winner Determination"
+	when
+		$b : Ballot(status == Ballot.Status.CLOSED, wdm == InstantRunoff.NAME)
+		not( VoteResult(ballot == $b) )
+		$votes : Set() from collect( Vote(ballot == $b, valid == true))
+	then
+		insert(InstantRunoff.determineWinner($b, $votes));
 end

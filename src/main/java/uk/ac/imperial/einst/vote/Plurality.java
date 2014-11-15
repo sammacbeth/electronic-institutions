@@ -58,7 +58,7 @@ public class Plurality {
 		}
 
 		// create results
-		VoteResult res = new VoteResult(ballot);
+		AutoCountVoteResult res = new AutoCountVoteResult(ballot);
 		res.setInvalidCount(invalidVotes);
 		for (int i = 0; i < voteCount.length; i++) {
 			Object opt = validOptions[i];

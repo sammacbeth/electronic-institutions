@@ -43,7 +43,7 @@ public class Borda {
 			}
 		}
 
-		VoteResult res = new VoteResult(ballot, true);
+		AutoCountVoteResult res = new AutoCountVoteResult(ballot, true);
 		res.setInvalidCount(invalidVotes);
 		for (int i = 0; i < bordaRank.length; i++) {
 			res.setScore(validOptions[i], bordaRank[i]);
